@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace ECommerce.Api.Identity;
 
-public class ApplicationRole
+public class ApplicationRole : IdentityRole
 {
-    
 }

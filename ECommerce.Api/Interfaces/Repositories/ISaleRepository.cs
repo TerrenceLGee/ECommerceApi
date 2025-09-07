@@ -3,7 +3,7 @@ using ECommerce.Api.Models;
 
 namespace ECommerce.Api.Interfaces.Repositories;
 
-public interface ISalesRepository
+public interface ISaleRepository
 {
     Task AddAsync(Sale sale);
     Task UpdateAsync(Sale sale);

@@ -1,7 +1,7 @@
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Models;
 
-namespace ECommerce.Api.Dtos.Interfaces.Repositories;
+namespace ECommerce.Api.Interfaces.Repositories;
 
 public interface IProductRepository
 {
