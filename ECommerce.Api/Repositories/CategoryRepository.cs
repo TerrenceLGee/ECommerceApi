@@ -43,7 +43,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            await _context.Categories.AddAsync(category);
+            _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateException ex)
