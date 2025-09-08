@@ -50,12 +50,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         modelBuilder.Entity<Sale>().Property(s => s.TotalPrice).HasPrecision(18, 2);
         modelBuilder.Entity<SaleProduct>().Property(sp => sp.UnitPrice).HasPrecision(18, 2);
 
-        modelBuilder.Entity<Address>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(a => a.CustomerId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Sale>()
             .HasOne<ApplicationUser>()
             .WithMany()

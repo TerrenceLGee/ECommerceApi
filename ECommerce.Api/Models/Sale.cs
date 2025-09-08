@@ -8,6 +8,8 @@ public class Sale
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public string CustomerId { get; set; } = string.Empty;
+    public Address ShippingAddress { get; set; } = new();
+    public Address? BillingAddress { get; set; }
     public decimal TotalPrice { get; set; }
     public SaleStatus Status { get; set; } = SaleStatus.Pending;
     public string? Notes { get; set; }

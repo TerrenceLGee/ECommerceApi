@@ -1,5 +1,6 @@
 using ECommerce.Api.Dtos.Categories.Request;
 using ECommerce.Api.Dtos.Categories.Response;
+using ECommerce.Api.Models.Enums;
 
 namespace ECommerce.Api.Dtos.Products.Response;
 
@@ -10,7 +11,62 @@ public class ProductResponse
     public string? Description { get; set; }
     public string? StockKeepingUnit { get; set; }
     public decimal Price { get; set; }
+    public DiscountStatus Discount { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
     public CategoryResponse Category { get; set; } = null!;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
