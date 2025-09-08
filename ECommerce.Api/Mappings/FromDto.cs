@@ -62,12 +62,13 @@ public static class FromDto
         };
     }
 
-    public static Sale MapFromCreateSaleRequestToSale(this CreateSaleRequest request, string customerId)
+    public static Sale MapFromCreateSaleRequestToSale(this CreateSaleRequest request, string customerId, Address customerAddress)
     {
         return new Sale
         {
             CustomerId = customerId,
             Notes = request.Notes,
+            ShippingAddress = customerAddress
         };
     }
 }

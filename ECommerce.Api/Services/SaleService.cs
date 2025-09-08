@@ -58,7 +58,17 @@ public class SaleService : ISalesService
                 }
             }
 
-            var newSale = request.MapFromCreateSaleRequestToSale(customerId);
+            var customerAddress = new Address
+            {
+                StreetNumber = request.StreetNumber,
+                StreetName = request.StreetName,
+                City = request.City,
+                State = request.State,
+                Country = request.Country,
+                ZipCode = request.ZipCode
+            };
+
+            var newSale = request.MapFromCreateSaleRequestToSale(customerId, customerAddress);
 
             var totalPrice = 0.0m;
 

@@ -25,9 +25,4 @@
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\" />
-      <Folder Include="Dtos\Auth\Response\" />
-    </ItemGroup>
-
 </Project>
