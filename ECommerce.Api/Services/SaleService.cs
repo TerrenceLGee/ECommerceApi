@@ -70,7 +70,7 @@ public class SaleService : ISalesService
                     ProductId = product.Id,
                     Quantity = item.Quantity,
                     UnitPrice = product.Price,
-                    DiscountPrice = product.Price - ((int)product.Discount * product.Price)
+                    DiscountPrice = product.Price - ((((int)product.Discount) / 100.0m) * product.Price)
                 };
 
                 newSale.SaleItems.Add(saleProduct);
