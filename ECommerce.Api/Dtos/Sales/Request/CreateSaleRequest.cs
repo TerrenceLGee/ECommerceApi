@@ -16,7 +16,6 @@ public class CreateSaleRequest
     public string Country { get; set; } = string.Empty;
     [Required]
     public string ZipCode { get; set; } = string.Empty;
-    [Required]
     public string? Notes { get; set; }
 
     [Required] [MinLength(1)] public List<SaleItemRequest> Items { get; set; } = [];

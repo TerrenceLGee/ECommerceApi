@@ -62,13 +62,18 @@ public static class FromDto
         };
     }
 
-    public static Sale MapFromCreateSaleRequestToSale(this CreateSaleRequest request, string customerId, Address customerAddress)
+    public static Sale MapFromCreateSaleRequestToSale(this CreateSaleRequest request, string customerId)
     {
         return new Sale
         {
             CustomerId = customerId,
             Notes = request.Notes,
-            ShippingAddress = customerAddress
+            StreetNumber = request.StreetNumber,
+            StreetName = request.StreetName,
+            City = request.City,
+            State = request.State,
+            Country = request.Country,
+            ZipCode = request.ZipCode,
         };
     }
 }

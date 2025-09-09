@@ -2,13 +2,14 @@ using ECommerce.Api.Common.Results;
 using ECommerce.Api.Dtos.Sales.Request;
 using ECommerce.Api.Dtos.Sales.Response;
 using ECommerce.Api.Dtos.Shared.Pagination;
+using ECommerce.Api.Models;
 using ECommerce.Api.Models.Enums;
 
 namespace ECommerce.Api.Interfaces.Services;
 
 public interface ISalesService
 {
-    Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId);
+    Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId, Address customerAddress);
     Task<Result<string>> UpdateSaleStatusAsync(int saleId, SaleStatus updatedStatus);
     Task<Result<string>> CancelSaleAsync(int saleId);
     Task<Result<string>> RefundSaleAsync(int saleId);

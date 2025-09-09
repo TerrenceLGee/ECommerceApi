@@ -2,6 +2,7 @@ using ECommerce.Api.Dtos.Auth.Request;
 using ECommerce.Api.Dtos.Auth.Response;
 using ECommerce.Api.Identity;
 using ECommerce.Api.Interfaces.Services;
+using ECommerce.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,18 @@ public class AuthController : ControllerBase
             FirstName = request.FirstName,
             LastName = request.LastName
         };
+
+        var newAddress = new Address
+        {
+            StreetNumber = request.StreetNumber,
+            StreetName = request.StreetName,
+            City = request.City,
+            State = request.State,
+            Country = request.Country,
+            ZipCode = request.ZipCode
+        };
+
+        newUser.Addresses.Add(newAddress);
 
         var result = await _userManager.CreateAsync(newUser, request.Password);
 

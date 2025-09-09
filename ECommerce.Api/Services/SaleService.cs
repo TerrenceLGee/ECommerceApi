@@ -28,7 +28,7 @@ public class SaleService : ISalesService
         _logger = logger;
     }
 
-    public async Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId)
+    public async Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId, Address customerAddress)
     {
         try
         {
@@ -58,17 +58,7 @@ public class SaleService : ISalesService
                 }
             }
 
-            var customerAddress = new Address
-            {
-                StreetNumber = request.StreetNumber,
-                StreetName = request.StreetName,
-                City = request.City,
-                State = request.State,
-                Country = request.Country,
-                ZipCode = request.ZipCode
-            };
-
-            var newSale = request.MapFromCreateSaleRequestToSale(customerId, customerAddress);
+            var newSale = request.MapFromCreateSaleRequestToSale(customerId);
 
             var totalPrice = 0.0m;
 

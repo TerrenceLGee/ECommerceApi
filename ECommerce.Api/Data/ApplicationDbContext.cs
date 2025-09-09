@@ -55,5 +55,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
             .WithMany()
             .HasForeignKey(s => s.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Addresses)
+            .WithOne(a => a.Customer)
+            .HasForeignKey(a => a.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

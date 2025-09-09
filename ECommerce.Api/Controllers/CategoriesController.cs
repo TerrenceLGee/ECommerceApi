@@ -27,7 +27,9 @@ public class CategoriesController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.ErrorMessage);
+            return result.ErrorMessage!.Contains("not found")
+                ? NotFound(result.ErrorMessage)
+                : StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage);
         }
 
         return Ok(result.Value);
@@ -43,7 +45,7 @@ public class CategoriesController : ControllerBase
         {
             return result.ErrorMessage!.Contains("not found")
                 ? NotFound(result.ErrorMessage)
-                : BadRequest(result.ErrorMessage);
+                : StatusCode(StatusCodes.Status500InternalServerError, result.ErrorMessage);
         }
 
         return Ok(result.Value);
