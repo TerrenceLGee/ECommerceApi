@@ -9,7 +9,7 @@ namespace ECommerce.Api.Interfaces.Services;
 
 public interface ISalesService
 {
-    Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId, Address customerAddress);
+    Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId);
     Task<Result<string>> UpdateSaleStatusAsync(int saleId, SaleStatus updatedStatus);
     Task<Result<string>> CancelSaleAsync(int saleId);
     Task<Result<string>> RefundSaleAsync(int saleId);

@@ -28,7 +28,7 @@ public class SaleService : ISalesService
         _logger = logger;
     }
 
-    public async Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId, Address customerAddress)
+    public async Task<Result<SaleResponse>> CreateSaleAsync(CreateSaleRequest request, string customerId)
     {
         try
         {
