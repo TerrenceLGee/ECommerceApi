@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using ECommerce.Api.Common.Results;
 using ECommerce.Api.Dtos.Sales.Request;
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Identity;
@@ -152,4 +153,38 @@ public class SalesController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpPost("me/sales/cancel/{id}")]
+    [Authorize]
+    public async Task<IActionResult> UserCancelSale(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _salesService.UserCancelSaleAsync(userId!, id);
+
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpPut("{id}/refund")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RefundSale(int id)
+    {
+        var result = await _salesService.RefundSaleAsync(id);
+
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
+    
 }

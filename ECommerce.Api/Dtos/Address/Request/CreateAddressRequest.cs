@@ -1,17 +1,20 @@
-using ECommerce.Api.Identity;
+using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.Api.Models;
+namespace ECommerce.Api.Dtos.Address.Request;
 
-public class Address
+public class CreateAddressRequest
 {
-    public int Id { get; set; }
-    public string CustomerId { get; set; } = string.Empty;
-    public ApplicationUser Customer { get; set; } = null!;
+    [Required]
     public string StreetNumber { get; set; } = string.Empty;
+    [Required]
     public string StreetName { get; set; } = string.Empty;
+    [Required]
     public string City { get; set; } = string.Empty;
+    [Required]
     public string State { get; set; } = string.Empty;
+    [Required]
     public string Country { get; set; } = string.Empty;
+    [Required]
     public string ZipCode { get; set; } = string.Empty;
     public string? Description { get; set; }
 }

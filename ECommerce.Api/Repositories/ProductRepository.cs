@@ -21,113 +21,48 @@ public class ProductRepository : IProductRepository
 
     public async Task AddAsync(Product product)
     {
-        try
-        {
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogCritical("{errorMessage}", ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An unexpected error occurred: {errorMessage}", ex.Message);
-            throw;
-        }
+        await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Product product)
     {
-        try
-        {
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogCritical("{errorMessage}", ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An unexpected error occurred: {errorMessage}", ex.Message);
-            throw;
-        }
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        try
-        {
-            return await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-        catch (ArgumentNullException ex)
-        {
-            _logger.LogCritical("{errorMessage}", ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An unexpected error occurred: {errorMessage}", ex.Message);
-            throw;
-        }
+        return await _context.Products
+            .Include(p => p.Category)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<PagedList<Product>> GetAllAsync(PaginationParams paginationParams)
     {
-        try
-        {
-            var query = _context.Products
-                .Include(p => p.Category)
-                .AsQueryable();
+        var query = _context.Products
+            .Include(p => p.Category)
+            .AsQueryable();
 
-            if (!string.IsNullOrEmpty(paginationParams.EntityName))
-            {
-                query = query.Where(p => p.Category.Name.ToLower() == paginationParams.EntityName.ToLower());
-            }
-
-            query = paginationParams.OrderBy switch
-            {
-                "priceAsc" => query.OrderBy(p => p.Price),
-                "priceDesc" => query.OrderByDescending(p => p.Price),
-                _ => query.OrderBy(p => p.Name)
-            };
-
-            return await PagedList<Product>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
-        }
-        catch (ArgumentNullException ex)
+        if (!string.IsNullOrEmpty(paginationParams.Filter))
         {
-            _logger.LogCritical("{errorMessage}", ex.Message);
-            throw;
+            query = query.Where(p => p.Category.Name.ToLower() == paginationParams.Filter.ToLower());
         }
-        catch (Exception ex)
+
+        query = paginationParams.OrderBy switch
         {
-            _logger.LogError("An unexpected error occurred: {errorMessage}", ex.Message);
-            throw;
-        }
+            "priceAsc" => query.OrderBy(p => p.Price),
+            "priceDesc" => query.OrderByDescending(p => p.Price),
+            _ => query.OrderBy(p => p.Name)
+        };
+
+        return await PagedList<Product>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
     }
 
     public async Task<List<Product>> GetByIdsAsync(IEnumerable<int> ids)
     {
-        try
-        {
-            return await _context.Products
-                .Where(p => ids.Contains(p.Id))
-                .ToListAsync();
-        }
-        catch (ArgumentNullException ex)
-        {
-            _logger.LogCritical("{errorMessage}", ex.Message);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An unexpected error occurred: {errorMessage}", ex.Message);
-            throw;
-        }
+        return await _context.Products
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
     }
 }

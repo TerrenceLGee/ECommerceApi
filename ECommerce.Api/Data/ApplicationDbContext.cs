@@ -11,7 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<Product> Products { get; set; }
     public DbSet<Sale> Sales { get; set; }
     public DbSet<SaleProduct> SaleProducts { get; set; }
-    public DbSet<Address> Address { get; set; }
+    public DbSet<Address> Addresses { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : base(options)
