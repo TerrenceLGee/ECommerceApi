@@ -16,7 +16,6 @@ namespace ECommerce.Api.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    // private readonly ApplicationDbContext _context;
     private readonly IAddressService _addressService;
     private readonly ILogger<UserService> _logger;
 
