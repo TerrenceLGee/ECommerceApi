@@ -60,7 +60,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
         modelBuilder.Entity<ApplicationUser>()
             .HasMany(u => u.Addresses)
-            .WithOne()
+            .WithOne(a => a.Customer)
             .HasForeignKey(a => a.ApplicationUserId)
             .OnDelete(DeleteBehavior.Cascade);
     }

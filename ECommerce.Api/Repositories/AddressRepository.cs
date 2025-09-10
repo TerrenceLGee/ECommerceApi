@@ -36,6 +36,7 @@ public class AddressRepository : IAddressRepository
     public async Task<PagedList<Address>> GetAllAddressesAsync(string customerId, PaginationParams paginationParams)
     {
         var query = _context.Addresses
+            .Include(a => a.Customer)
             .Where(a => a.ApplicationUserId == customerId)
             .AsQueryable();
 
@@ -58,6 +59,7 @@ public class AddressRepository : IAddressRepository
     {
         return await _context.Addresses
             .Where(a => a.ApplicationUserId == customerId)
+            .Include(a => a.Customer)
             .FirstOrDefaultAsync(a => a.Id == addressId);
     }
 }
