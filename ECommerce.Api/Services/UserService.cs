@@ -101,37 +101,6 @@ public class UserService : IUserService
     {
         try
         {
-            // var query = _context.Addresses
-            //     .Include(a => a.Customer)
-            //     .Where(a => a.AddressType == userId)
-            //     .AsQueryable();
-            //
-            // if (!string.IsNullOrEmpty(paginationParams.Filter))
-            // {
-            //     query = query.Where(a =>
-            //         a.AddressType != null && a.AddressType.ToLower() == paginationParams.Filter.ToLower());
-            // }
-            //
-            // query = paginationParams.OrderBy switch
-            // {
-            //     "idAsc" => query.OrderBy(a => a.Id),
-            //     "idDesc" => query.OrderByDescending(a => a.Id),
-            //     _ => query.OrderBy(a => a.AddressType)
-            // };
-            //
-            // var pagedAddresses =
-            //     await PagedList<Address>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
-            //
-            // var addressResponseDtos = pagedAddresses.Items
-            //     .Select(a => a.MapAddressToAddressResponse())
-            //     .ToList();
-            //
-            // var pagedResponse = new PagedList<AddressResponse>(
-            //     addressResponseDtos,
-            //     pagedAddresses.TotalCount,
-            //     pagedAddresses.CurrentPage,
-            //     pagedAddresses.PageSize);
-
             return  await _addressService.GetAllAddressesAsync(userId, paginationParams);
         }
         catch (Exception ex)
