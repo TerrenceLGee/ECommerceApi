@@ -1,5 +1,4 @@
 using ECommerce.Api.Common.Results;
-using ECommerce.Api.Data;
 using ECommerce.Api.Dtos.Address.Response;
 using ECommerce.Api.Dtos.Auth.Response;
 using ECommerce.Api.Dtos.Shared.Pagination;
@@ -7,7 +6,6 @@ using ECommerce.Api.Identity;
 using ECommerce.Api.Interfaces.Repositories;
 using ECommerce.Api.Interfaces.Services;
 using ECommerce.Api.Mappings;
-using ECommerce.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,16 +14,16 @@ namespace ECommerce.Api.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IAddressService _addressService;
+    private readonly IAddressRepository _addressRepository;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
         UserManager<ApplicationUser> userManager, 
-        IAddressService addressService,
+        IAddressRepository addressRepository,
         ILogger<UserService> logger)
     {
         _userManager = userManager;
-        _addressService = addressService;
+        _addressRepository = addressRepository; 
         _logger = logger;
     }
     
@@ -100,7 +98,28 @@ public class UserService : IUserService
     {
         try
         {
-            return  await _addressService.GetAllAddressesAsync(userId, paginationParams);
+            var userExists = await _userManager.Users
+                .AnyAsync(u => u.Id == userId);
+
+            if (!userExists)
+            {
+                _logger.LogCritical("User with Id {userId} not found.", userId);
+                return Result<PagedList<AddressResponse>>.Fail($"User with Id {userId} not found");
+            }
+
+            var addresses = await _addressRepository.GetAllAddressesAsync(userId, paginationParams);
+
+            var addressResponseDtos = addresses.Items
+                .Select(a => a.MapAddressToAddressResponse())
+                .ToList();
+
+            var pagedResponse = new PagedList<AddressResponse>(
+                addressResponseDtos,
+                addresses.TotalCount,
+                addresses.CurrentPage,
+                addresses.PageSize);
+
+            return Result<PagedList<AddressResponse>>.Ok(pagedResponse);
         }
         catch (Exception ex)
         {
