@@ -9,14 +9,11 @@ namespace ECommerce.Api.Repositories;
 public class SaleRepository : ISaleRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<SaleRepository> _logger;
 
     public SaleRepository(
-        ApplicationDbContext context,
-        ILogger<SaleRepository> logger)
+        ApplicationDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     public async Task AddAsync(Sale sale)

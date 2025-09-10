@@ -9,14 +9,10 @@ namespace ECommerce.Api.Repositories;
 public class AddressRepository : IAddressRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<AddressRepository> _logger;
 
-    public AddressRepository(
-        ApplicationDbContext context,
-        ILogger<AddressRepository> logger)
+    public AddressRepository(ApplicationDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     public async Task AddAddressAsync(Address address)
@@ -37,11 +33,10 @@ public class AddressRepository : IAddressRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<PagedList<Address>> GetAllAsync(string customerId, PaginationParams paginationParams)
+    public async Task<PagedList<Address>> GetAllAddressesAsync(string customerId, PaginationParams paginationParams)
     {
         var query = _context.Addresses
-            .Include(a => a.Customer)
-            .Where(a => a.CustomerId == customerId)
+            .Where(a => a.ApplicationUserId == customerId)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(paginationParams.Filter))
@@ -59,11 +54,10 @@ public class AddressRepository : IAddressRepository
         return await PagedList<Address>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
     }
 
-    public async Task<Address?> GetAddressById(string customerId, int addressId)
+    public async Task<Address?> GetAddressByIdAsync(string customerId, int addressId)
     {
         return await _context.Addresses
-            .Include(a => a.Customer)
-            .Where(a => a.CustomerId == customerId)
+            .Where(a => a.ApplicationUserId == customerId)
             .FirstOrDefaultAsync(a => a.Id == addressId);
     }
 }

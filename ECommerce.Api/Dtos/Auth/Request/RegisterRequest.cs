@@ -23,7 +23,7 @@ public class RegisterRequest
     public string Country { get; set; } = string.Empty;
     [Required]
     public string ZipCode { get; set; } = string.Empty;
-    public string? AddressDescription { get; set; }
+    public string? Description { get; set; }
 
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

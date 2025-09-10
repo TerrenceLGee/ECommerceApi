@@ -36,7 +36,8 @@ public class AuthController : ControllerBase
             Email = request.Email,
             UserName = request.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
+            Addresses = new List<Address>()
         };
 
         var newAddress = new Address
@@ -46,7 +47,8 @@ public class AuthController : ControllerBase
             City = request.City,
             State = request.State,
             Country = request.Country,
-            ZipCode = request.ZipCode
+            ZipCode = request.ZipCode,
+            Description = request.Description
         };
 
         newUser.Addresses.Add(newAddress);

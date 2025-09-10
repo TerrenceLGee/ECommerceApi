@@ -1,3 +1,4 @@
+using ECommerce.Api.Dtos.Address.Response;
 using ECommerce.Api.Dtos.Categories.Response;
 using ECommerce.Api.Dtos.Products.Response;
 using ECommerce.Api.Dtos.Sales.Response;
@@ -73,6 +74,21 @@ public static class ToDto
             DiscountPrice = saleProduct.DiscountPrice,
             GrossPrice = saleProduct.GrossPrice,
             FinalPrice = saleProduct.FinalPrice,
+        };
+    }
+
+    public static AddressResponse MapAddressToAddressResponse(this Address address)
+    {
+        return new AddressResponse
+        {
+            Id = address.Id,
+            StreetNumber = address.StreetNumber,
+            StreetName = address.StreetName,
+            City = address.City,
+            State = address.State,
+            Country = address.Country,
+            ZipCode = address.ZipCode,
+            Description = address.Description
         };
     }
 }

@@ -9,14 +9,10 @@ namespace ECommerce.Api.Repositories;
 public class CategoryRepository : ICategoryRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<CategoryRepository> _logger;
 
-    public CategoryRepository(
-        ApplicationDbContext context,
-        ILogger<CategoryRepository> logger)
+    public CategoryRepository(ApplicationDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
 

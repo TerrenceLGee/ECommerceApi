@@ -2,6 +2,7 @@ namespace ECommerce.Api.Dtos.Address.Response;
 
 public class AddressResponse
 {
+    public int Id { get; set; }
     public string StreetNumber { get; set; } = string.Empty;
     public string StreetName { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
@@ -9,5 +10,5 @@ public class AddressResponse
     public string Country { get; set; } = string.Empty;
     public string ZipCode { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public string FullAddress => $"{Description ?? "Address"}\n{StreetNumber} {StreetName}\n{City}, {State}, {ZipCode}\n{Country}";
+    public string FullAddress => $"{StreetNumber} {StreetName} {City}, {State}, {ZipCode} {Country}---{Description}";
 }

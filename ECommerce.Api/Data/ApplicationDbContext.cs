@@ -49,6 +49,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
         modelBuilder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
         modelBuilder.Entity<Sale>().Property(s => s.TotalPrice).HasPrecision(18, 2);
         modelBuilder.Entity<SaleProduct>().Property(sp => sp.UnitPrice).HasPrecision(18, 2);
+        modelBuilder.Entity<SaleProduct>().Property(sp => sp.DiscountPrice)
+            .HasPrecision(18, 2);
 
         modelBuilder.Entity<Sale>()
             .HasOne<ApplicationUser>()
@@ -58,8 +60,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 
         modelBuilder.Entity<ApplicationUser>()
             .HasMany(u => u.Addresses)
-            .WithOne(a => a.Customer)
-            .HasForeignKey(a => a.CustomerId)
+            .WithOne()
+            .HasForeignKey(a => a.ApplicationUserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -9,14 +9,10 @@ namespace ECommerce.Api.Repositories;
 public class ProductRepository : IProductRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<ProductRepository> _logger;
 
-    public ProductRepository(
-        ApplicationDbContext context,
-        ILogger<ProductRepository> logger)
+    public ProductRepository(ApplicationDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     public async Task AddAsync(Product product)

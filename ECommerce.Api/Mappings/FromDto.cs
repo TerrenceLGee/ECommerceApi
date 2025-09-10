@@ -1,3 +1,4 @@
+using ECommerce.Api.Dtos.Address.Request;
 using ECommerce.Api.Dtos.Categories.Request;
 using ECommerce.Api.Dtos.Products.Request;
 using ECommerce.Api.Dtos.Sales.Request;
@@ -75,5 +76,30 @@ public static class FromDto
             Country = request.Country,
             ZipCode = request.ZipCode,
         };
+    }
+
+    public static Address MapFromCreateAddressRequestToAddress(this CreateAddressRequest request)
+    {
+        return new Address
+        {
+            StreetNumber = request.StreetNumber,
+            StreetName = request.StreetName,
+            City = request.City,
+            State = request.State,
+            Country = request.Country,
+            ZipCode = request.ZipCode,
+            Description = request.Description,
+        };
+    }
+
+    public static void MapFromUpdateAddressRequestToAddress(this UpdateAddressRequest request, Address address)
+    {
+        address.StreetNumber = request.StreetNumber;
+        address.StreetName = request.StreetName;
+        address.City = request.City;
+        address.State = request.State;
+        address.Country = request.Country;
+        address.ZipCode = request.ZipCode;
+        address.Description = request.Description;
     }
 }
