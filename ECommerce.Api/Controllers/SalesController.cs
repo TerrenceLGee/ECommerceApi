@@ -1,11 +1,8 @@
 using System.Security.Claims;
-using ECommerce.Api.Common.Results;
 using ECommerce.Api.Dtos.Sales.Request;
 using ECommerce.Api.Dtos.Shared.Pagination;
-using ECommerce.Api.Identity;
 using ECommerce.Api.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers;

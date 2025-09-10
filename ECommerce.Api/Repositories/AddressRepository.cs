@@ -42,14 +42,14 @@ public class AddressRepository : IAddressRepository
 
         if (!string.IsNullOrEmpty(paginationParams.Filter))
         {
-            query = query.Where(a => a.Description != null && a.Description!.ToLower() == paginationParams.Filter.ToLower());
+            query = query.Where(a => a.AddressType.ToLower() == paginationParams.Filter.ToLower());
         }
 
         query = paginationParams.OrderBy switch
         {
             "idAsc" => query.OrderBy(a => a.Id),
             "idDesc" => query.OrderByDescending(a => a.Id),
-            _ => query.OrderBy(p => p.Description)
+            _ => query.OrderBy(p => p.AddressType)
         };
 
         return await PagedList<Address>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);

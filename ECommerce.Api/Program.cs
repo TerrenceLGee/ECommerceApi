@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mime;
 using System.Text;
 using ECommerce.Api.Data;
 using ECommerce.Api.Identity;
@@ -12,10 +11,30 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
+
+var loggingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+Directory.CreateDirectory(loggingDirectory);
+var filePath = Path.Combine(loggingDirectory, "app-.txt");
+var outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: filePath, 
+            rollingInterval: RollingInterval.Day,
+            outputTemplate: outputTemplate)
+        .Enrich.FromLogContext()
+        .WriteTo.Debug();
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -89,6 +108,7 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISalesService, SaleService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();

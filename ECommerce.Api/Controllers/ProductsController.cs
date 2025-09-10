@@ -3,7 +3,6 @@ using ECommerce.Api.Dtos.Products.Response;
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers;

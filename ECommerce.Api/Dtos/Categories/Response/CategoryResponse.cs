@@ -1,5 +1,4 @@
 using ECommerce.Api.Dtos.Products.Response;
-using ECommerce.Api.Models;
 
 namespace ECommerce.Api.Dtos.Categories.Response;
 

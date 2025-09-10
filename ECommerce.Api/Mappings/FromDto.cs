@@ -88,7 +88,7 @@ public static class FromDto
             State = request.State,
             Country = request.Country,
             ZipCode = request.ZipCode,
-            Description = request.Description,
+            AddressType = request.AddressType
         };
     }
 
@@ -100,6 +100,6 @@ public static class FromDto
         address.State = request.State;
         address.Country = request.Country;
         address.ZipCode = request.ZipCode;
-        address.Description = request.Description;
+        address.AddressType = request.AddressType;
     }
 }

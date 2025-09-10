@@ -1,4 +1,3 @@
-using ECommerce.Api.Dtos.Categories.Request;
 using ECommerce.Api.Dtos.Categories.Response;
 using ECommerce.Api.Models.Enums;
 

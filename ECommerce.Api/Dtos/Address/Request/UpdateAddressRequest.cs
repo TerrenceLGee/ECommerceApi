@@ -16,5 +16,6 @@ public class UpdateAddressRequest
     public string Country { get; set; } = string.Empty;
     [Required]
     public string ZipCode { get; set; } = string.Empty;
-    public string? Description { get; set; }
+
+    [Required] public string AddressType { get; set; } = string.Empty;
 }

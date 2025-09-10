@@ -1,7 +1,9 @@
 using ECommerce.Api.Dtos.Address.Response;
+using ECommerce.Api.Dtos.Auth.Response;
 using ECommerce.Api.Dtos.Categories.Response;
 using ECommerce.Api.Dtos.Products.Response;
 using ECommerce.Api.Dtos.Sales.Response;
+using ECommerce.Api.Identity;
 using ECommerce.Api.Models;
 
 namespace ECommerce.Api.Mappings;
@@ -88,7 +90,39 @@ public static class ToDto
             State = address.State,
             Country = address.Country,
             ZipCode = address.ZipCode,
-            Description = address.Description
+            Description = address.AddressType
         };
+    }
+
+    public static UserResponse MapApplicationUserToUserResponse(this ApplicationUser applicationUser)
+    {
+        return new UserResponse
+        {
+            UserId = applicationUser.Id,
+            FirstName = applicationUser.FirstName,
+            LastName = applicationUser.LastName,
+            EmailAddress = applicationUser.Email!,
+            BirthDate = applicationUser.DateOfBirth,
+            Age = GetCorrectAgeForUser(applicationUser.DateOfBirth)
+        };
+    }
+
+
+    private static int GetCorrectAgeForUser(DateOnly birthDate)
+    {
+        int age = (DateTime.Now.Year - birthDate.Year);
+        if (birthDate.Month > DateTime.Now.Month)
+        {
+            age -= 1;
+        }
+        else if (birthDate.Month == DateTime.Now.Month)
+        {
+            if (birthDate.Day > DateTime.Now.Day)
+            {
+                age -= 1;
+            }
+        }
+
+        return age;
     }
 }

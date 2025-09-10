@@ -2,7 +2,6 @@ using ECommerce.Api.Common.Results;
 using ECommerce.Api.Dtos.Sales.Request;
 using ECommerce.Api.Dtos.Sales.Response;
 using ECommerce.Api.Dtos.Shared.Pagination;
-using ECommerce.Api.Models;
 using ECommerce.Api.Models.Enums;
 
 namespace ECommerce.Api.Interfaces.Services;

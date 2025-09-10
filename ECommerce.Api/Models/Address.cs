@@ -13,5 +13,5 @@ public class Address
     public string State { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string ZipCode { get; set; } = string.Empty;
-    public string? Description { get; set; }
+    public string AddressType { get; set; } = string.Empty;
 }
