@@ -1,7 +1,7 @@
-using ECommerce.Api.Dtos.Categories.Response;
-using ECommerce.Api.Models.Enums;
+using ECommerce.Presentation.Dtos.Categories.Response;
+using ECommerce.Presentation.Enums;
 
-namespace ECommerce.Api.Dtos.Products.Response;
+namespace ECommerce.Presentation.Dtos.Products.Response;
 
 public class ProductResponse
 {
@@ -15,4 +15,3 @@ public class ProductResponse
     public bool IsActive { get; set; }
     public CategoryResponse Category { get; set; } = null!;
 }
-

@@ -90,7 +90,7 @@ public static class ToDto
             State = address.State,
             Country = address.Country,
             ZipCode = address.ZipCode,
-            Description = address.AddressType
+            AddressType = address.AddressType
         };
     }
 

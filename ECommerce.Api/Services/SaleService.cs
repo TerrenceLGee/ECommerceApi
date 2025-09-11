@@ -114,6 +114,7 @@ public class SaleService : ISalesService
             }
 
             saleToUpdate.Status = updatedStatus;
+            saleToUpdate.UpdatedAt = DateTime.UtcNow;
             await _saleRepository.UpdateAsync(saleToUpdate);
 
             return Result<string>.Ok(
