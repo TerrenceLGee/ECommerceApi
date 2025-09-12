@@ -1,7 +1,6 @@
 using ECommerce.Presentation.Dtos.Categories.Response;
 using ECommerce.Presentation.Dtos.Products.Response;
 using ECommerce.Presentation.Interfaces;
-using ECommerce.Presentation.UI.Helpers;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Categories;
@@ -44,6 +43,26 @@ public class CategoriesUI
         }
         
         DisplayCategories(response.Value);
+    }
+
+    public async Task HandleViewCategoryById()
+    {
+        AnsiConsole.MarkupLine("[bold underline yellow]Select from the following categories to view:[/]");
+        
+        await HandleViewAllCategories();
+
+        var id = AnsiConsole.Ask<int>("[green]Enter the id of the category that you wish to view: [/]");
+
+        var result = await _categoryApiService.GetCategoryByIdAsync(id);
+
+        if (result.IsSuccess && result.Value is not null)
+        {
+            await DisplayCategoryResponse(result.Value, $"Category information");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"[red]{result.ErrorMessage}[/]");
+        }
     }
 
     private void DisplayCategories(List<CategoryResponse> categories)
