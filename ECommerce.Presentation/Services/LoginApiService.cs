@@ -103,7 +103,7 @@ public class LoginApiService : ILoginApiService
                 }
             }
 
-            return Result<string>.Ok($"Registration successful for {request.Email}");
+            return Result<string>.Ok($"Registration successful for {request.Email}! You can now log in.");
         }
         catch (Exception ex)
         {
