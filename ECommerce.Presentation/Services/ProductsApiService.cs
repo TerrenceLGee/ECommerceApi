@@ -22,45 +22,45 @@ public class ProductsApiService : IProductsApiService
         _logger = logger;
     }
     
-    public async Task<Result<PagedList<ProductResponse>?>> GetProductsAsync(PaginationParams paginationParams)
+    public async Task<Result<List<ProductResponse>?>> GetProductsAsync(int pageNumber, int pageSize)
     {
         try
         {
             var queryString =
-                $"api/products?pageNumber={paginationParams.PageNumber}&pageSize={paginationParams.PageSize}";
+                $"api/products?pageNumber={pageNumber}&pageSize={pageSize}";
             var response = await _httpClient.GetAsync(queryString);
 
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error retrieving products, returned: {statusCode}:", response.StatusCode);
-                return Result<PagedList<ProductResponse>?>.Fail(
+                return Result<List<ProductResponse>?>.Fail(
                     $"Error retrieving products, returned: {response.StatusCode}");
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<PagedList<ProductResponse>>(options);
+            var results = await response.Content.ReadFromJsonAsync<List<ProductResponse>>(options);
 
-            return Result<PagedList<ProductResponse>?>.Ok(results);
+            return Result<List<ProductResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
         {
             _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
-            return Result<PagedList<ProductResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+            return Result<List<ProductResponse>?>.Fail($"Uri Format Error: {ex.Message}");
         }
         catch (HttpRequestException ex)
         {
             _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
-            return Result<PagedList<ProductResponse>?>.Fail($"Http Request Error: {ex.Message}");
+            return Result<List<ProductResponse>?>.Fail($"Http Request Error: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
-            return Result<PagedList<ProductResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+            return Result<List<ProductResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}", ex.Message);
-            return Result<PagedList<ProductResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+            return Result<List<ProductResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 
@@ -181,6 +181,53 @@ public class ProductsApiService : IProductsApiService
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
             return Result<ProductResponse?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfProductsAsync()
+    {
+        try
+        {
+            var queryString = "api/products/count";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error getting count of products, returned: {statusCode}", response.StatusCode);
+                return Result<int>.Fail($"Error getting count of products, returned: {response.StatusCode}");
+            }
+
+            var results = await response.Content.ReadAsStringAsync();
+
+            if (int.TryParse(results, out var count))
+            {
+                return Result<int>.Ok(count);
+            }
+            else
+            {
+                _logger.LogError("Error retrieving count of products");
+                return Result<int>.Fail("Error retrieving count of products");
+            }
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<int>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

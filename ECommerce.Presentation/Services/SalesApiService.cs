@@ -3,7 +3,6 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Sales.Request;
 using ECommerce.Presentation.Dtos.Sales.Response;
-using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -192,86 +191,86 @@ public class SalesApiService : ISalesApiService
         }
     }
 
-    public async Task<Result<PagedList<SaleResponse>?>> GetAllSalesAsync(PaginationParams paginationParams)
+    public async Task<Result<List<SaleResponse>?>> GetAllSalesAsync(int pageNumber, int pageSize)
     {
         try
         {
             var queryString =
-                $"api/sales?pageNumber={paginationParams.PageNumber}&pageSize={paginationParams.PageSize}";
+                $"api/sales?pageNumber={pageNumber}&pageSize={pageSize}";
             var response = await _httpClient.GetAsync(queryString);
 
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error retrieving sales, returned: {statusCode}:", response.StatusCode);
-                return Result<PagedList<SaleResponse>?>.Fail(
+                return Result<List<SaleResponse>?>.Fail(
                     $"Error retrieving sales, returned: {response.StatusCode}");
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<PagedList<SaleResponse>>(options);
+            var results = await response.Content.ReadFromJsonAsync<List<SaleResponse>>(options);
 
-            return Result<PagedList<SaleResponse>?>.Ok(results);
+            return Result<List<SaleResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
         {
             _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Uri Format Error: {ex.Message}");
         }
         catch (HttpRequestException ex)
         {
             _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Http Request Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Http Request Error: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 
-    public async Task<Result<PagedList<SaleResponse>?>> GetAllSalesForUserAsync(PaginationParams paginationParams)
+    public async Task<Result<List<SaleResponse>?>> GetAllSalesForUserAsync(int pageNumber, int pageSize)
     {
         try
         {
             var queryString =
-                $"api/sales/me/sales?pageNumber={paginationParams.PageNumber}&pageSize={paginationParams.PageSize}";
+                $"api/sales/me/sales?pageNumber={pageNumber}&pageSize={pageSize}";
             var response = await _httpClient.GetAsync(queryString);
 
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error retrieving sales, returned: {statusCode}:", response.StatusCode);
-                return Result<PagedList<SaleResponse>?>.Fail($"Error retrieving sales, returned {response.StatusCode}");
+                return Result<List<SaleResponse>?>.Fail($"Error retrieving sales, returned {response.StatusCode}");
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<PagedList<SaleResponse>>(options);
+            var results = await response.Content.ReadFromJsonAsync<List<SaleResponse>>(options);
 
-            return Result<PagedList<SaleResponse>?>.Ok(results);
+            return Result<List<SaleResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
         {
             _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Uri Format Error: {ex.Message}");
         }
         catch (HttpRequestException ex)
         {
             _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Http Request Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Http Request Error: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
-            return Result<PagedList<SaleResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+            return Result<List<SaleResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 
@@ -354,6 +353,100 @@ public class SalesApiService : ISalesApiService
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
             return Result<SaleResponse?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfSalesAsync()
+    {
+        try
+        {
+            var queryString = "api/sales/count";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error getting count of sales, returned: {statusCode}", response.StatusCode);
+                return Result<int>.Fail($"Error getting count of sales, returned: {response.StatusCode}");
+            }
+
+            var results = await response.Content.ReadAsStringAsync();
+
+            if (int.TryParse(results, out var count))
+            {
+                return Result<int>.Ok(count);
+            }
+            else
+            {
+                _logger.LogError("Error retrieving count of sales");
+                return Result<int>.Fail("Error retrieving count of sales");
+            }
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<int>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfSalesForUserAsync()
+    {
+        try
+        {
+            var queryString = "api/sales/me/sales/count";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error getting count of sales, returned: {statusCode}", response.StatusCode);
+                return Result<int>.Fail($"Error getting count of sales, returned: {response.StatusCode}");
+            }
+
+            var results = await response.Content.ReadAsStringAsync();
+
+            if (int.TryParse(results, out var count))
+            {
+                return Result<int>.Ok(count);
+            }
+            else
+            {
+                _logger.LogError("Error retrieving count of sales");
+                return Result<int>.Fail("Error retrieving count of sales");
+            }
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<int>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

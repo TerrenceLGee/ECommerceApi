@@ -174,4 +174,20 @@ public class ProductService : IProductService
             return Result<PagedList<ProductResponse>>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
+
+    public async Task<Result<int>> GetCountOfProductsAsync()
+    {
+        try
+        {
+            var count = await _productRepository.GetCountOfProductsAsync();
+
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of products from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of products from the database: {ex.Message}");
+        }
+    }
 }

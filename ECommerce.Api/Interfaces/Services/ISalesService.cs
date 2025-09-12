@@ -17,4 +17,6 @@ public interface ISalesService
     Task<Result<SaleResponse>> GetSaleByIdAsync(int id);
     Task<Result<PagedList<SaleResponse>>> GetUserSalesAsync(string userId, PaginationParams paginationParams);
     Task<Result<SaleResponse>> GetUserSaleByIdAsync(string userId, int saleId);
+    Task<Result<int>> GetCountOfSalesAsync();
+    Task<Result<int>> GetCountOfUserSalesAsync(string userId);
 }

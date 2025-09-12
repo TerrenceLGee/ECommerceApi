@@ -98,4 +98,19 @@ public class ProductsController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetCountOfProducts()
+    {
+        var result = await _productService.GetCountOfProductsAsync();
+        
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
 }

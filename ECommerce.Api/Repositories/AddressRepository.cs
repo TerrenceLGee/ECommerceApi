@@ -2,6 +2,7 @@ using ECommerce.Api.Data;
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Interfaces.Repositories;
 using ECommerce.Api.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Repositories;
@@ -61,5 +62,13 @@ public class AddressRepository : IAddressRepository
             .Where(a => a.ApplicationUserId == customerId)
             .Include(a => a.Customer)
             .FirstOrDefaultAsync(a => a.Id == addressId);
+    }
+
+    public async Task<int> GetCountOfAddressesAsync(string customerId)
+    {
+        return await _context.Addresses
+            .Include(a => a.Customer)
+            .Where(a => a.ApplicationUserId == customerId)
+            .CountAsync();
     }
 }

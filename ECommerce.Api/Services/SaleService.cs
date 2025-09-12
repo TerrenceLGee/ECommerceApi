@@ -344,4 +344,36 @@ public class SaleService : ISalesService
             return Result<SaleResponse>.Fail($"There was an unexpected error that occurred: {ex.Message}");
         }
     }
+
+    public async Task<Result<int>> GetCountOfSalesAsync()
+    {
+        try
+        {
+            var count = await _saleRepository.GetCountOfSalesAsync();
+
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of sales from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of sales from the database: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfUserSalesAsync(string userId)
+    {
+        try
+        {
+            var count = await _saleRepository.GetCountOfUserSalesAsync(userId);
+
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of sales from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of sales from the database: {ex.Message}");
+        }
+    }
 }

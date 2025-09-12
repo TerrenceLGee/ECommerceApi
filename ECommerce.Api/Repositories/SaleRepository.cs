@@ -82,4 +82,21 @@ public class SaleRepository : ISaleRepository
 
         return await PagedList<Sale>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
     }
+
+    public async Task<int> GetCountOfSalesAsync()
+    {
+        return await _context.Sales
+            .Include(s => s.SaleItems)
+            .ThenInclude(si => si.Product)
+            .CountAsync();
+    }
+
+    public async Task<int> GetCountOfUserSalesAsync(string userId)
+    {
+        return await _context.Sales
+            .Include(s => s.SaleItems)
+            .ThenInclude(si => si.Product)
+            .Where(s => s.CustomerId == userId)
+            .CountAsync();
+    }
 }

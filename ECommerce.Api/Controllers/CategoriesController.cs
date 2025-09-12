@@ -100,4 +100,19 @@ public class CategoriesController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet("count")]
+    public async Task<IActionResult> GetCountOfCategories()
+    {
+        var result = await _categoryService.GetCategoriesCountAsync();
+        
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
 }

@@ -7,7 +7,7 @@ namespace ECommerce.Presentation.Interfaces;
 public interface ILoginApiService
 {
     string? JwtToken { get; set; }
-    Task<Result> LoginAsync(string email, string password);
+    Task<Result> LoginAsync(LoginRequest request);
     Task<Result<string>> RegisterAsync(RegisterRequest request);
     Result<ClaimsPrincipal> GetPrincipalFromToken(string token);
 }

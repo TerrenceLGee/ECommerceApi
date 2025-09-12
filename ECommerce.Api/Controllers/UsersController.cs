@@ -65,4 +65,20 @@ public class UsersController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet("count")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCountOfUsers()
+    {
+        var result = await _userService.GetUserCountAsync();
+
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
 }

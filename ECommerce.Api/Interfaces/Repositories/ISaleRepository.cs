@@ -11,4 +11,6 @@ public interface ISaleRepository
     Task<Sale?> GetUserSaleByIdAsync(string userId, int saleId);
     Task<PagedList<Sale>> GetAllAsync(PaginationParams paginationParams);
     Task<PagedList<Sale>> GetByUserIdAsync(string userId, PaginationParams paginationParams);
+    Task<int> GetCountOfSalesAsync();
+    Task<int> GetCountOfUserSalesAsync(string userId);
 }

@@ -10,4 +10,5 @@ public interface IProductRepository
     Task<Product?> GetByIdAsync(int id);
     Task<PagedList<Product>> GetAllAsync(PaginationParams paginationParams);
     Task<List<Product>> GetByIdsAsync(IEnumerable<int> ids);
+    Task<int> GetCountOfProductsAsync();
 }

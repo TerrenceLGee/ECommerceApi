@@ -3,7 +3,6 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Categories.Request;
 using ECommerce.Presentation.Dtos.Categories.Response;
-using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -22,45 +21,45 @@ public class CategoriesApiService : ICategoriesApiService
         _logger = logger;
     }
     
-    public async Task<Result<PagedList<CategoryResponse>?>> GetCategoriesAsync(PaginationParams paginationParams)
+    public async Task<Result<List<CategoryResponse>?>> GetCategoriesAsync(int pageNumber, int pageSize)
     {
         try
         {
             var queryString =
-                $"api/categories?pageNumber={paginationParams.PageNumber}&pageSize={paginationParams.PageSize}";
+                $"api/categories?pageNumber={pageNumber}&pageSize={pageSize}";
             var response = await _httpClient.GetAsync(queryString);
 
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error retrieving categories returned: {statusCode}:", response.StatusCode);
-                return Result<PagedList<CategoryResponse>?>.Fail(
+                return Result<List<CategoryResponse>?>.Fail(
                     $"Error retrieving categories returned: {response.StatusCode}");
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<PagedList<CategoryResponse>>(options);
+            var results = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>(options);
             
-            return Result<PagedList<CategoryResponse>?>.Ok(results);
+            return Result<List<CategoryResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
         {
             _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
-            return Result<PagedList<CategoryResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+            return Result<List<CategoryResponse>?>.Fail($"Uri Format Error: {ex.Message}");
         }
         catch (HttpRequestException ex)
         {
             _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
-            return Result<PagedList<CategoryResponse>?>.Fail($"Http Request Error: {ex.Message}");
+            return Result<List<CategoryResponse>?>.Fail($"Http Request Error: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
-            return Result<PagedList<CategoryResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+            return Result<List<CategoryResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}", ex.Message);
-            return Result<PagedList<CategoryResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+            return Result<List<CategoryResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 
@@ -183,6 +182,53 @@ public class CategoriesApiService : ICategoriesApiService
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
             return Result<CategoryResponse?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfCategoriesAsync()
+    {
+        try
+        {
+            var queryString = "api/categories/count";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error getting count of categories, returned: {statusCode}", response.StatusCode);
+                return Result<int>.Fail($"Error getting count of categories, returned {response.StatusCode}");
+            }
+
+            var results = await response.Content.ReadAsStringAsync();
+
+            if (int.TryParse(results, out var count))
+            {
+                return Result<int>.Ok(count);
+            }
+            else
+            {
+                _logger.LogError("Error retrieving count of categories");
+                return Result<int>.Fail("Error retrieving count of categories");
+            }
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<int>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

@@ -133,4 +133,27 @@ public class AddressesController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet("count")]
+    [Authorize]
+    public async Task<IActionResult> GetCountOfAddresses()
+    {
+        var customerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (customerId is null)
+        {
+            return Unauthorized();
+        }
+        
+        var result = await _addressService.GetCountOfAddressesAsync(customerId);
+        
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
 }

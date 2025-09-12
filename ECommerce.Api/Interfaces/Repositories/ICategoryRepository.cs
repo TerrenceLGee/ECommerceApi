@@ -10,4 +10,5 @@ public interface ICategoryRepository
     Task<bool> ExistsAsync(int id);
     Task<Category?> GetCategoryByIdAsync(int id);
     Task<PagedList<Category>> GetCategoriesAsync(PaginationParams paginationParams);
+    Task<int> GetCountOfCategoriesAsync();
 }

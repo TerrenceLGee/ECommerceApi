@@ -153,4 +153,20 @@ public class CategoryService : ICategoryService
             return Result<PagedList<CategoryResponse>>.Fail($"There was an unexpected error: {ex.Message}");
         }
     }
+
+    public async Task<Result<int>> GetCategoriesCountAsync()
+    {
+        try
+        {
+            var count = await _categoryRepository.GetCountOfCategoriesAsync();
+
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of categories from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of categories from the database: {ex.Message}");
+        }
+    }
 }

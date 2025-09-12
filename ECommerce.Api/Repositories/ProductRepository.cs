@@ -61,4 +61,11 @@ public class ProductRepository : IProductRepository
             .Where(p => ids.Contains(p.Id))
             .ToListAsync();
     }
+
+    public async Task<int> GetCountOfProductsAsync()
+    {
+        return await _context.Products
+            .Include(p => p.Category)
+            .CountAsync();
+    }
 }

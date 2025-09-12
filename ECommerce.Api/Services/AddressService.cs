@@ -154,4 +154,20 @@ public class AddressService : IAddressService
             return Result<AddressResponse>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
+
+    public async Task<Result<int>> GetCountOfAddressesAsync(string customerId)
+    {
+        try
+        {
+            var count = await _addressRepository.GetCountOfAddressesAsync(customerId);
+
+            return Result<int>.Ok(count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of addresses from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of addresses from the database: {ex.Message}");
+        }
+    }
 }

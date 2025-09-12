@@ -28,17 +28,11 @@ public class LoginApiService : ILoginApiService
         _logger = logger;
     }
     
-    public async Task<Result> LoginAsync(string email, string password)
+    public async Task<Result> LoginAsync(LoginRequest request)
     {
         try
         {
-            var loginRequest = new LoginRequest
-            {
-                Email = email,
-                Password = password
-            };
-
-            var response = await _httpClient.PostAsJsonAsync("api/auth/login", loginRequest);
+            var response = await _httpClient.PostAsJsonAsync("api/auth/login", request);
 
             if (!response.IsSuccessStatusCode)
             {

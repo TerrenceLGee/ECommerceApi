@@ -12,4 +12,5 @@ public interface IAddressService
     Task<Result<AddressResponse>> DeleteAddressAsync(string customerId, int addressId);
     Task<Result<PagedList<AddressResponse>>> GetAllAddressesAsync(string customerId, PaginationParams paginationParams);
     Task<Result<AddressResponse>> GetAddressByIdAsync(string customerId, int addressId);
+    Task<Result<int>> GetCountOfAddressesAsync(string customerId);
 }

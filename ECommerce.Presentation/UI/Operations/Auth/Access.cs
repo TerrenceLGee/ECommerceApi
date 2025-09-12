@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Claims;
+using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Request;
 using ECommerce.Presentation.Interfaces;
 using Spectre.Console;
@@ -75,5 +76,43 @@ public class Access
         {
             AnsiConsole.MarkupLine($"[bold red]Unable to register you at this time...\n{registered.ErrorMessage}[/]");
         }
+    }
+
+    public async Task<(bool isLoggedIn, bool isAdmin)> HandleLogin()
+    {
+        var email = AnsiConsole.Ask<string>("Enter your [green]email[/]: ");
+        var password = AnsiConsole.Prompt(new TextPrompt<string>("Enter your [green]password[/]: ").Secret());
+        var request = new LoginRequest
+        {
+            Email = email,
+            Password = password
+        };
+
+        var isLoggedIn = false;
+        var isAdmin = false;
+        Result successResult = null!;
+
+        await AnsiConsole.Status().StartAsync("Authenticating...", async _ =>
+        {
+            successResult = await _loginApiService.LoginAsync(request);
+        });
+
+        if (successResult.IsSuccess)
+        {
+            AnsiConsole.MarkupLine("[bold green]Login successful![/]");
+            isLoggedIn = true;
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"[bold red]Login failed. Please check your credentials: {successResult.ErrorMessage}[/]");
+        }
+
+        if (successResult.IsSuccess && !string.IsNullOrEmpty(_loginApiService.JwtToken))
+        {
+            var principalResult = _loginApiService.GetPrincipalFromToken(_loginApiService.JwtToken);
+            isAdmin = principalResult.Value!.HasClaim(ClaimTypes.Role, "Admin");
+        }
+
+        return (isLoggedIn, isAdmin);
     }
 }

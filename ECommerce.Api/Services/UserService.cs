@@ -128,4 +128,20 @@ public class UserService : IUserService
                 $"There was an unexpected error retrieving the addresses of user with id {userId} from the database: {ex.Message}");
         }
     }
+
+    public async Task<Result<int>> GetUserCountAsync()
+    {
+        try
+        {
+            var userCount = await _userManager.Users.CountAsync();
+
+            return Result<int>.Ok(userCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("There was an unexpected error retrieving the count of users from the database: {errorMessage}", ex.Message);
+            return Result<int>.Fail(
+                $"There was an unexpected error retrieving the count of users from the database: {ex.Message}");
+        }
+    }
 }

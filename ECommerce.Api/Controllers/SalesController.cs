@@ -183,5 +183,38 @@ public class SalesController : ControllerBase
 
         return Ok(result.Value);
     }
-    
+
+    [HttpGet("count")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetCountOfAllSales()
+    {
+        var result = await _salesService.GetCountOfSalesAsync();
+        
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("me/sales/count")]
+    [Authorize]
+    public async Task<IActionResult> GetCountOfUserSales()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var result = await _salesService.GetCountOfUserSalesAsync(userId!);
+        
+        if (result.IsFailure)
+        {
+            return result.ErrorMessage!.Contains("Not found")
+                ? NotFound(result.ErrorMessage)
+                : BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(result.Value);
+    }
 }

@@ -111,44 +111,44 @@ public class AddressApiService : IAddressApiService
         }
     }
 
-    public async Task<Result<PagedList<AddressResponse>?>> GetAllAddressesAsync(PaginationParams paginationParams)
+    public async Task<Result<List<AddressResponse>?>> GetAllAddressesAsync(int pageNumber, int pageSize)
     {
         try
         {
-            var queryString = $"api/addresses?pageNumber={paginationParams.PageNumber}&pageSize={paginationParams.PageSize}";
+            var queryString = $"api/addresses?pageNumber={pageNumber}&pageSize={pageSize}";
             var response = await _httpClient.GetAsync(queryString);
 
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("Error retrieving addresses, returned: {statusCode}", response.StatusCode);
-                return Result<PagedList<AddressResponse>?>.Fail(
+                return Result<List<AddressResponse>?>.Fail(
                     $"Error retrieving address, returned: {response.StatusCode}");
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<PagedList<AddressResponse>>(options);
+            var results = await response.Content.ReadFromJsonAsync<List<AddressResponse>>(options);
 
-            return Result<PagedList<AddressResponse>?>.Ok(results);
+            return Result<List<AddressResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
         {
             _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
-            return Result<PagedList<AddressResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+            return Result<List<AddressResponse>?>.Fail($"Uri Format Error: {ex.Message}");
         }
         catch (HttpRequestException ex)
         {
             _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
-            return Result<PagedList<AddressResponse>?>.Fail($"Http Request Error: {ex.Message}");
+            return Result<List<AddressResponse>?>.Fail($"Http Request Error: {ex.Message}");
         }
         catch (InvalidOperationException ex)
         {
             _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
-            return Result<PagedList<AddressResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+            return Result<List<AddressResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
         }
         catch (Exception ex)
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
-            return Result<PagedList<AddressResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+            return Result<List<AddressResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 
@@ -191,6 +191,53 @@ public class AddressApiService : IAddressApiService
         {
             _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
             return Result<AddressResponse?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<int>> GetCountOfAddressesAsync()
+    {
+        try
+        {
+            var queryString = "api/addresses/count";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error getting count of addresses, returned: {statusCode}", response.StatusCode);
+                return Result<int>.Fail($"Error getting count of addresses, returned: {response.StatusCode}");
+            }
+
+            var results = await response.Content.ReadAsStringAsync();
+
+            if (int.TryParse(results, out var count))
+            {
+                return Result<int>.Ok(count);
+            }
+            else
+            {
+                _logger.LogError("Error retrieving count of addresses");
+                return Result<int>.Fail("Error retrieving count of addresses");
+            }
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<int>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<int>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

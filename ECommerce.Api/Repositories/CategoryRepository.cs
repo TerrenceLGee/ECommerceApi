@@ -60,4 +60,10 @@ public class CategoryRepository : ICategoryRepository
 
         return await PagedList<Category>.CreateAsync(query, paginationParams.PageNumber, paginationParams.PageSize);
     }
+
+    public async Task<int> GetCountOfCategoriesAsync()
+    {
+        return await _context.Categories
+            .CountAsync();
+    }
 }
