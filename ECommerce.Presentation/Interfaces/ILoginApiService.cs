@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Request;
 
 namespace ECommerce.Presentation.Interfaces;
@@ -6,7 +7,7 @@ namespace ECommerce.Presentation.Interfaces;
 public interface ILoginApiService
 {
     string? JwtToken { get; set; }
-    Task<bool> LoginAsync(string email, string password);
-    Task<bool> RegisterAsync(RegisterRequest request);
-    ClaimsPrincipal GetPrincipalFromToken(string token);
+    Task<Result> LoginAsync(string email, string password);
+    Task<Result<string>> RegisterAsync(RegisterRequest request);
+    Result<ClaimsPrincipal> GetPrincipalFromToken(string token);
 }
