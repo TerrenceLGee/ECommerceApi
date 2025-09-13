@@ -7,6 +7,7 @@ namespace ECommerce.Presentation.Interfaces;
 public interface ICategoriesApiService
 {
     Task<Result<List<CategoryResponse>?>> GetCategoriesAsync(int pageNumber, int pageSize);
+    Task<Result<List<CategoryResponse>?>> GetCategoriesForSummaryAsync();
     Task<Result<CategoryResponse?>> GetCategoryByIdAsync(int id);
     Task<Result<CategoryResponse?>> CreateCategoryAsync(CreateCategoryRequest request);
     Task<Result<CategoryResponse?>> UpdateCategoryAsync(int id, UpdateCategoryRequest request);

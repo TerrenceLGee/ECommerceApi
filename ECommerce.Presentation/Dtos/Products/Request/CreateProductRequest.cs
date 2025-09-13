@@ -20,4 +20,6 @@ public class CreateProductRequest
     public int StockQuantity { get; set; }
     [Required]
     public int CategoryId { get; set; }
+    [Required]
+    public bool IsActive { get; set; }
 }

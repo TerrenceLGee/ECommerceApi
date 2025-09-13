@@ -63,6 +63,46 @@ public class CategoriesApiService : ICategoriesApiService
         }
     }
 
+    public async Task<Result<List<CategoryResponse>?>> GetCategoriesForSummaryAsync()
+    {
+        try
+        {
+            var queryString = $"api/categories";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error retrieving categories, returned: {statusCode}: ", response.StatusCode);
+                return Result<List<CategoryResponse>?>.Fail($"Error retrieving categories returned: {response.StatusCode}");
+            }
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var results = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>(options);
+
+            return Result<List<CategoryResponse>?>.Ok(results);
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<List<CategoryResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<List<CategoryResponse>?>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<List<CategoryResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}", ex.Message);
+            return Result<List<CategoryResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
     public async Task<Result<CategoryResponse?>> GetCategoryByIdAsync(int id)
     {
         try
