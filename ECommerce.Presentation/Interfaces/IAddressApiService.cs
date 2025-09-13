@@ -10,6 +10,7 @@ public interface IAddressApiService
     Task<Result<AddressResponse?>> UpdateAddressAsync(int addressId, UpdateAddressRequest request);
     Task<Result<AddressResponse?>> DeleteAddressAsync(int addressId);
     Task<Result<List<AddressResponse>?>> GetAllAddressesAsync(int pageNumber, int pageSize);
+    Task<Result<List<AddressResponse>?>> GetAddressesForDisplay();
     Task<Result<AddressResponse?>> GetAddressByIdAsync(int addressId);
     Task<Result<int>> GetCountOfAddressesAsync();
 }

@@ -152,6 +152,46 @@ public class AddressApiService : IAddressApiService
         }
     }
 
+    public async Task<Result<List<AddressResponse>?>> GetAddressesForDisplay()
+    {
+        try
+        {
+            var queryString = $"api/addresses";
+            var response = await _httpClient.GetAsync(queryString);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Error retrieving addresses, returned: {statusCode}", response.StatusCode);
+                return Result<List<AddressResponse>?>.Fail($"Error retrieving addresses, returned: {response.StatusCode}");
+            }
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var results = await response.Content.ReadFromJsonAsync<List<AddressResponse>>(options);
+
+            return Result<List<AddressResponse>?>.Ok(results);
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogCritical("Uri Format Error: {errorMessage}", ex.Message);
+            return Result<List<AddressResponse>?>.Fail($"Uri Format Error: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogCritical("Http Request Error: {errorMessage}", ex.Message);
+            return Result<List<AddressResponse>?>.Fail($"Http Request Error: {ex.Message}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogCritical("Invalid Operation Error: {errorMessage}", ex.Message);
+            return Result<List<AddressResponse>?>.Fail($"Invalid Operation Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}: ", ex.Message);
+            return Result<List<AddressResponse>?>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
+
     public async Task<Result<AddressResponse?>> GetAddressByIdAsync(int addressId)
     {
         try

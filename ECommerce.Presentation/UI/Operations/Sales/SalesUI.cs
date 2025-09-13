@@ -1,9 +1,11 @@
 using ECommerce.Presentation.Common.Results;
+using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Dtos.Sales.Request;
 using ECommerce.Presentation.Dtos.Sales.Response;
 using ECommerce.Presentation.Enums;
 using ECommerce.Presentation.Enums.Extensions;
 using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.UI.Operations.Addresses;
 using ECommerce.Presentation.UI.Operations.Products;
 using Spectre.Console;
 
@@ -14,23 +16,36 @@ public class SalesUI
     private readonly ISalesApiService _salesApiService;
     private readonly IProductsApiService _productsApiService;
     private readonly ICategoriesApiService _categoriesApiService;
+    private readonly IAddressApiService _addressApiService;
     private const string DateFormat = "MM/dd/yyyy hh:mm:ss";
 
     public SalesUI(
         ISalesApiService salesApiService,
         IProductsApiService productsApiService,
-        ICategoriesApiService categoriesApiService)
+        ICategoriesApiService categoriesApiService,
+        IAddressApiService addressApiService)
     {
         _salesApiService = salesApiService;
         _productsApiService = productsApiService;
         _categoriesApiService = categoriesApiService;
+        _addressApiService = addressApiService;
     }
 
     public async Task HandleViewAllSalesAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View All Sales[/]");
-        var salesCount = _salesApiService.GetCountOfSalesAsync();
-        AnsiConsole.MarkupLine($"There are currently [green]{salesCount}[/] sales available to view");
+        var salesCountResult = await _salesApiService.GetCountOfSalesAsync();
+
+        if (salesCountResult.IsFailure || salesCountResult.Value == 0)
+        {
+            AnsiConsole.MarkupLine("[red]There are no sales available to display[/]");
+            AnsiConsole.WriteLine("Press any key to continue: ");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+        
+        AnsiConsole.MarkupLine($"There are currently [green]{salesCountResult.Value}[/] sales available to view");
 
         var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
             ? AnsiConsole.Ask<int>("Enter page number to view: ")
@@ -57,8 +72,18 @@ public class SalesUI
     public async Task HandleViewAllSalesForUserAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View All Sales[/]");
-        var salesCount = _salesApiService.GetCountOfSalesForUserAsync();
-        AnsiConsole.MarkupLine($"There are currently [green]{salesCount}[/] sales available to view");
+        var salesCountResult  = await _salesApiService.GetCountOfSalesForUserAsync();
+        
+        if (salesCountResult.IsFailure || salesCountResult.Value == 0)
+        {
+            AnsiConsole.MarkupLine("[red]There are no sales available to display[/]");
+            AnsiConsole.WriteLine("Press any key to continue: ");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+        
+        AnsiConsole.MarkupLine($"There are currently [green]{salesCountResult.Value}[/] sales available to view");
 
         var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
             ? AnsiConsole.Ask<int>("Enter page number to view: ")
@@ -129,6 +154,7 @@ public class SalesUI
     public async Task HandleCreateSaleAsync()
     {
         AnsiConsole.MarkupLine("[bold]Create a New Sale[/]");
+        
 
         var productsUI = new ProductsUI(_productsApiService, _categoriesApiService);
         
@@ -168,11 +194,27 @@ public class SalesUI
             AnsiConsole.MarkupLine("[yellow]Sale canceled. No items in cart.[/]");
             return;
         }
+        
+        AnsiConsole.MarkupLine("[green]Please enter address information:[/]");
+
+        var addressResponse = await GetAddressForSale();
+        var streetNumber = addressResponse.StreetNumber;
+        var streetName = addressResponse.StreetName;
+        var city = addressResponse.City;
+        var state = addressResponse.State;
+        var country = addressResponse.Country;
+        var zipCode = addressResponse.ZipCode;
 
         var notes = AnsiConsole.Ask<string>("Enter any [green]notes[/] for the sale (optional): ");
 
         var saleRequest = new CreateSaleRequest
         {
+            StreetNumber = streetNumber,
+            StreetName = streetName,
+            City = city,
+            State = state,
+            Country = country,
+            ZipCode = zipCode,
             Items = shoppingCart,
             Notes = notes
         };
@@ -423,41 +465,6 @@ public class SalesUI
         AnsiConsole.WriteLine();
     }
 
-    private void DisplaySaleProduct(SaleProductResponse saleProduct)
-    {
-        var table = new Table()
-            .Title("Product details")
-            .Border(TableBorder.Rounded);
-
-        table.AddColumn("Id");
-        table.AddColumn("Name");
-        table.AddColumn("Quantity In Stock");
-        table.AddColumn("Unit Price");
-        table.AddColumn("Discount Price");
-        table.AddColumn("Gross Price");
-        table.AddColumn("Final Price");
-
-        var id = $"{saleProduct.ProductId}";
-        var name = saleProduct.ProductName;
-        var quantity = $"{saleProduct.Quantity}";
-        var unitPrice = $"${saleProduct.UnitPrice:F2}";
-        var discountPrice = $"${saleProduct.DiscountPrice:F2}";
-        var grossPrice = $"${saleProduct.GrossPrice:F2}";
-        var finalPrice = $"${saleProduct.FinalPrice}";
-
-        table.AddRow(
-            id,
-            name,
-            quantity,
-            unitPrice,
-            discountPrice,
-            grossPrice,
-            finalPrice);
-
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
-    }
-    
     private SaleStatus GetSaleStatus()
     {
         return AnsiConsole.Prompt(
@@ -465,5 +472,43 @@ public class SalesUI
                 .Title("Please choose sale status: ")
                 .AddChoices(Enum.GetValues<SaleStatus>())
                 .UseConverter(choice => choice.GetDisplayName()));
+    }
+
+    private async Task<AddressResponse> GetAddressForSale()
+    {
+        var addressUI = new AddressUI(_addressApiService);
+        
+        var useNewAddress = AnsiConsole.Confirm("Do you wish to use a new address for this sale? ");
+
+
+
+        AddressResponse? addressResponse;
+        
+        if (useNewAddress)
+        {
+            var streetNumber = AnsiConsole.Ask<string>("Enter street number: ");
+            var streetName = AnsiConsole.Ask<string>("Enter street name: ");
+            var city = AnsiConsole.Ask<string>("Enter city: ");
+            var state = AnsiConsole.Ask<string>("Enter state: ");
+            var country = AnsiConsole.Ask<string>("Enter country: ");
+            var zipCode = AnsiConsole.Ask<string>("Enter zip code: ");
+
+            addressResponse = new AddressResponse
+            {
+                StreetNumber = streetNumber,
+                StreetName = streetName,
+                City = city,
+                State = state,
+                Country = country,
+                ZipCode = zipCode
+            };
+        }
+        else
+        {
+            addressResponse = await addressUI.GetAddress();
+        }
+
+        return addressResponse!;
+
     }
 }

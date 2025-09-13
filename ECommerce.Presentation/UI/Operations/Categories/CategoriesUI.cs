@@ -22,9 +22,18 @@ public class CategoriesUI
 
     public async Task HandleViewAllCategoriesAsync()
     {
-        var countOfCategories = await _categoryApiService.GetCountOfCategoriesAsync();
+        var countOfCategoriesResult = await _categoryApiService.GetCountOfCategoriesAsync();
+
+        if (countOfCategoriesResult.IsFailure || countOfCategoriesResult.Value == 0)
+        {
+            AnsiConsole.MarkupLine("[red]There are no categories available to view[/]");
+            AnsiConsole.WriteLine("Press any key to continue");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
         
-        AnsiConsole.MarkupLine($"There are {countOfCategories} categories available to view");
+        AnsiConsole.MarkupLine($"There are {countOfCategoriesResult.Value} categories available to view");
         
         var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
             ? AnsiConsole.Ask<int>("Enter page number to view")

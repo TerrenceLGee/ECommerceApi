@@ -23,8 +23,18 @@ public class ProductsUI
 
     public async Task HandleViewAllProductsAsync()
     {
-        var countOfProducts = await _productsApiService.GetCountOfProductsAsync();
-        AnsiConsole.MarkupLine($"There are {countOfProducts} products available to view");
+        var countOfProductsResult = await _productsApiService.GetCountOfProductsAsync();
+
+        if (countOfProductsResult.IsFailure || countOfProductsResult.Value == 0)
+        {
+            AnsiConsole.MarkupLine("[red]There are no products available to view[/]");
+            AnsiConsole.WriteLine("Press any key to continue");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+        
+        AnsiConsole.MarkupLine($"There are {countOfProductsResult.Value} products available to view");
 
         var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
             ? AnsiConsole.Ask<int>("Enter page number to view ")
