@@ -21,12 +21,12 @@ public class ProductsUI
         _categoriesApiService = categoriesApiService;
     }
 
-    public async Task HandleViewAllProducts()
+    public async Task HandleViewAllProductsAsync()
     {
         var countOfProducts = await _productsApiService.GetCountOfProductsAsync();
         AnsiConsole.MarkupLine($"There are {countOfProducts} products available to view");
 
-        var pageNumber = AnsiConsole.Confirm("Would you like to specificy the page number to view? (default is 1): ")
+        var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
             ? AnsiConsole.Ask<int>("Enter page number to view ")
             : 1;
 
@@ -48,11 +48,11 @@ public class ProductsUI
         DisplayProducts(response.Value);
     }
 
-    public async Task HandleViewProductById()
+    public async Task HandleViewProductByIdAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View detailed information about a product[/]");
         AnsiConsole.MarkupLine("[green]Choose a product to view its information[/]");
-        await HandleViewAllProducts();
+        await HandleViewAllProductsAsync();
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the product that you wish to view[/]");
 
         var productResult = await _productsApiService.GetProductByIdAsync(id);
@@ -69,13 +69,27 @@ public class ProductsUI
         DisplayProductResponse(productResult.Value,$"Product #{productResult.Value.Id}");
     }
 
-    public async Task HandleAddProduct()
+    public async Task ViewProductForSale(int id)
+    {
+        var productResult = await _productsApiService.GetProductByIdAsync(id);
+
+        if (productResult.IsFailure || productResult.Value is null)
+        {
+            AnsiConsole.MarkupLine($"[red]{productResult.ErrorMessage}[/]");
+            AnsiConsole.MarkupLine("Press any key to continue: ");
+            Console.ReadKey();
+            return;
+        }
+        
+        DisplayProductResponse(productResult.Value, $"Product #{productResult.Value.Id}");
+    }
+    public async Task HandleAddProductAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Add a new product to the database[/]");
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine("[underline green]Choose a category for the new product:[/]");
-        if (!await DisplayCategorySummaries())
+        if (!await DisplayCategorySummariesAsync())
         {
             return;
         }
@@ -121,11 +135,11 @@ public class ProductsUI
         }
     }
 
-    public async Task HandleUpdateProduct()
+    public async Task HandleUpdateProductAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Update a product in the database[/]");
         AnsiConsole.MarkupLine("[green]Choose from the available products:[/]");
-        await HandleViewAllProducts();
+        await HandleViewAllProductsAsync();
 
         var productId = AnsiConsole.Ask<int>("Enter the id of the product to update: ");
 
@@ -148,7 +162,7 @@ public class ProductsUI
         if (updateProductCategory)
         {
             AnsiConsole.MarkupLine("[green]Choose from the following categories:[/]");
-            if (!await DisplayCategorySummaries())
+            if (!await DisplayCategorySummariesAsync())
             {
                 return;
             }
@@ -223,11 +237,11 @@ public class ProductsUI
         }
     }
 
-    public async Task HandleDeleteProduct()
+    public async Task HandleDeleteProductAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Delete a product from the database[/]");
         AnsiConsole.MarkupLine("[green]Choose from the available products[/]");
-        await HandleViewAllProducts();
+        await HandleViewAllProductsAsync();
 
         var productId = AnsiConsole.Ask<int>("Enter the id of the product to delete: ");
 
@@ -345,7 +359,7 @@ public class ProductsUI
         AnsiConsole.WriteLine();
     }
 
-    private async Task<bool> DisplayCategorySummaries()
+    private async Task<bool> DisplayCategorySummariesAsync()
     {
         var categoriesResult = await _categoriesApiService.GetCategoriesForSummaryAsync();
 

@@ -20,7 +20,7 @@ public class CategoriesUI
         _productsApiService = productsApiService;
     }
 
-    public async Task HandleViewAllCategories()
+    public async Task HandleViewAllCategoriesAsync()
     {
         var countOfCategories = await _categoryApiService.GetCountOfCategoriesAsync();
         
@@ -47,11 +47,11 @@ public class CategoriesUI
         DisplayCategories(response.Value);
     }
 
-    public async Task HandleViewCategoryById()
+    public async Task HandleViewCategoryByIdAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Select from the following categories to view:[/]");
         
-        await HandleViewAllCategories();
+        await HandleViewAllCategoriesAsync();
 
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the category that you wish to view: [/]");
 
@@ -67,7 +67,7 @@ public class CategoriesUI
         }
     }
 
-    public async Task HandleAddCategory()
+    public async Task HandleAddCategoryAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Add a category to the database[/]");
         AnsiConsole.WriteLine();
@@ -102,13 +102,13 @@ public class CategoriesUI
         }
     }
 
-    public async Task HandleUpdateCategory()
+    public async Task HandleUpdateCategoryAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Update an existing category in the database[/]");
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine("[bold underline green]Please choose from an existing category[/]");
-        await HandleViewAllCategories();
+        await HandleViewAllCategoriesAsync();
         AnsiConsole.WriteLine();
 
         var categoryId = AnsiConsole.Ask<int>("Enter the id of the category to update: ");
@@ -167,13 +167,13 @@ public class CategoriesUI
         }
     }
 
-    public async Task HandleDeleteCategory()
+    public async Task HandleDeleteCategoryAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Delete an existing category from the database[/]");
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine("[bold underline green]Please choose from an existing category: [/]");
-        await HandleViewAllCategories();
+        await HandleViewAllCategoriesAsync();
         AnsiConsole.WriteLine();
 
         var categoryId = AnsiConsole.Ask<int>("Enter id of category to delete: ");
