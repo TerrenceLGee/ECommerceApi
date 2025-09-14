@@ -103,26 +103,17 @@ public static class ToDto
             LastName = applicationUser.LastName,
             EmailAddress = applicationUser.Email!,
             BirthDate = applicationUser.DateOfBirth,
-            Age = GetCorrectAgeForUser(applicationUser.DateOfBirth)
+            Age = GetCorrectAgeForUser(applicationUser.DateOfBirth),
+            Addresses = applicationUser.Addresses
+                .Select(a => a.MapAddressToAddressResponse()).ToList()
         };
     }
 
 
     private static int GetCorrectAgeForUser(DateOnly birthDate)
     {
-        int age = (DateTime.Now.Year - birthDate.Year);
-        if (birthDate.Month > DateTime.Now.Month)
-        {
-            age -= 1;
-        }
-        else if (birthDate.Month == DateTime.Now.Month)
-        {
-            if (birthDate.Day > DateTime.Now.Day)
-            {
-                age -= 1;
-            }
-        }
-
-        return age;
+        return birthDate.DayOfYear > DateTime.Now.DayOfYear
+            ? DateTime.Now.AddYears(-1).Year - birthDate.Year
+            : DateTime.Now.Year - birthDate.Year;
     }
 }

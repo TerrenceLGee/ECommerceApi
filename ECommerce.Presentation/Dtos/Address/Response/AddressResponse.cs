@@ -10,5 +10,5 @@ public class AddressResponse
     public string Country { get; set; } = string.Empty;
     public string ZipCode { get; set; } = string.Empty;
     public string AddressType { get; set; } = string.Empty;
-    public string FullAddress => $"{StreetNumber} {StreetName} {City}, {State}, {ZipCode} {Country}---{AddressType}";
+    public string FullAddress => $"{StreetNumber} {StreetName} {City}, {State}, {ZipCode} {Country}";
 }

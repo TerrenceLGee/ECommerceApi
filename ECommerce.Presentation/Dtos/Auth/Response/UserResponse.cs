@@ -1,3 +1,5 @@
+using ECommerce.Presentation.Dtos.Address.Response;
+
 namespace ECommerce.Presentation.Dtos.Auth.Response;
 
 public class UserResponse
@@ -8,4 +10,5 @@ public class UserResponse
     public string EmailAddress { get; set; } = string.Empty;
     public DateOnly BirthDate { get; set; }
     public int Age { get; set; }
+    public List<AddressResponse> Addresses = new();
 }
