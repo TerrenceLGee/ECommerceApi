@@ -1,3 +1,5 @@
+using ECommerce.Presentation.Common.Results;
+using ECommerce.Presentation.Dtos.Address.Request;
 using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Interfaces;
 using Spectre.Console;
@@ -13,8 +15,10 @@ public class AddressUI
         _addressApiService = addressApiService;
     }
 
-    public async Task HandleViewAllAddressesAsync()
+    public async Task<bool> HandleViewAllAddressesAsync()
     {
+        AnsiConsole.MarkupLine("[bold underline yellow]View all of your addresses[/]");
+        
         var countOfAddressesResult = await _addressApiService.GetCountOfAddressesAsync();
 
         if (countOfAddressesResult.IsFailure || countOfAddressesResult.Value == 0)
@@ -23,7 +27,7 @@ public class AddressUI
             AnsiConsole.WriteLine("Press any key to continue: ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
 
         AnsiConsole.MarkupLine($"There are {countOfAddressesResult.Value} addresses available to view");
@@ -44,15 +48,80 @@ public class AddressUI
             AnsiConsole.WriteLine("Press any key to return to the previous menu ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         DisplayAddresses(response.Value);
+        return true;
     }
 
     public async Task HandleViewAddressByIdAsync()
     {
-        
+        AnsiConsole.MarkupLine("[bold underline yellow]View an individual address[/]");
+        AnsiConsole.MarkupLine("[green]Choose from one of the following addresses:[/]");
+
+        if (!await HandleViewAllAddressesAsync())
+        {
+            return;
+        }
+
+        var addressId = AnsiConsole.Ask<int>("Enter the id of the address that you wish to view: ");
+
+        var addressResponseResult = await _addressApiService.GetAddressByIdAsync(addressId);
+
+        if (addressResponseResult.IsFailure || addressResponseResult.Value is null)
+        {
+            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
+            AnsiConsole.WriteLine("Press any key to continue");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+
+        DisplayAddress(addressResponseResult.Value, "Address details");
+
+    }
+
+    public async Task HandleAddAddressAsync()
+    {
+        AnsiConsole.MarkupLine("[bold underline yellow]Add an address[/]");
+        AnsiConsole.WriteLine();
+
+        var streetNumber = AnsiConsole.Ask<string>("Enter street number: ");
+        var streetName = AnsiConsole.Ask<string>("Enter street name: ");
+        var city = AnsiConsole.Ask<string>("Enter city: ");
+        var state = AnsiConsole.Ask<string>("Enter state: ");
+        var country = AnsiConsole.Ask<string>("Enter country: ");
+        var zipCode = AnsiConsole.Ask<string>("Enter zip code: ");
+
+        var request = new CreateAddressRequest
+        {
+            StreetNumber = streetNumber,
+            StreetName = streetName,
+            City = city,
+            State = state,
+            Country = country,
+            ZipCode = zipCode
+        };
+
+        Result<AddressResponse?> addressResponseResult = null!;
+
+        await AnsiConsole.Status().StartAsync("Adding address...", async _ =>
+        {
+            addressResponseResult = await _addressApiService.AddAddressAsync(request);
+        });
+
+        if (addressResponseResult.IsSuccess && addressResponseResult.Value is not null)
+        {
+            var addressResponse = addressResponseResult.Value;
+            AnsiConsole.MarkupLine("[bold green]Address added successfully![/]");
+            var title = "Newly added address";
+            DisplayAddress(addressResponse, title);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
+        }
     }
 
     public void DisplayAddresses(List<AddressResponse> addresses)

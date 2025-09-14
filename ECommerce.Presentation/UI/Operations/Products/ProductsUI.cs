@@ -21,7 +21,7 @@ public class ProductsUI
         _categoriesApiService = categoriesApiService;
     }
 
-    public async Task HandleViewAllProductsAsync()
+    public async Task<bool> HandleViewAllProductsAsync()
     {
         var countOfProductsResult = await _productsApiService.GetCountOfProductsAsync();
 
@@ -31,7 +31,7 @@ public class ProductsUI
             AnsiConsole.WriteLine("Press any key to continue");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         AnsiConsole.MarkupLine($"There are {countOfProductsResult.Value} products available to view");
@@ -52,17 +52,23 @@ public class ProductsUI
             AnsiConsole.WriteLine("Press any key to return to the previous menu ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         DisplayProducts(response.Value);
+        return true;
     }
 
     public async Task HandleViewProductByIdAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View detailed information about a product[/]");
         AnsiConsole.MarkupLine("[green]Choose a product to view its information[/]");
-        await HandleViewAllProductsAsync();
+
+        if (!await HandleViewAllProductsAsync())
+        {
+            return;
+        }
+
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the product that you wish to view[/]");
 
         var productResult = await _productsApiService.GetProductByIdAsync(id);
@@ -149,7 +155,11 @@ public class ProductsUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Update a product in the database[/]");
         AnsiConsole.MarkupLine("[green]Choose from the available products:[/]");
-        await HandleViewAllProductsAsync();
+
+        if (!await HandleViewAllProductsAsync())
+        {
+            return;
+        }
 
         var productId = AnsiConsole.Ask<int>("Enter the id of the product to update: ");
 
@@ -251,7 +261,11 @@ public class ProductsUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Delete a product from the database[/]");
         AnsiConsole.MarkupLine("[green]Choose from the available products[/]");
-        await HandleViewAllProductsAsync();
+
+        if (!await HandleViewAllProductsAsync())
+        {
+            return;
+        }
 
         var productId = AnsiConsole.Ask<int>("Enter the id of the product to delete: ");
 

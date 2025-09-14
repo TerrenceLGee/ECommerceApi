@@ -31,7 +31,7 @@ public class SalesUI
         _addressApiService = addressApiService;
     }
 
-    public async Task HandleViewAllSalesAsync()
+    public async Task<bool> HandleViewAllSalesAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View All Sales[/]");
         var salesCountResult = await _salesApiService.GetCountOfSalesAsync();
@@ -42,7 +42,7 @@ public class SalesUI
             AnsiConsole.WriteLine("Press any key to continue: ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         AnsiConsole.MarkupLine($"There are currently [green]{salesCountResult.Value}[/] sales available to view");
@@ -63,13 +63,14 @@ public class SalesUI
             AnsiConsole.WriteLine("Press any key to return to the previous menu ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         DisplaySaleResponses(response.Value);
+        return true;
     }
 
-    public async Task HandleViewAllSalesForUserAsync()
+    public async Task<bool> HandleViewAllSalesForUserAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View All Sales[/]");
         var salesCountResult  = await _salesApiService.GetCountOfSalesForUserAsync();
@@ -80,7 +81,7 @@ public class SalesUI
             AnsiConsole.WriteLine("Press any key to continue: ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         AnsiConsole.MarkupLine($"There are currently [green]{salesCountResult.Value}[/] sales available to view");
@@ -101,17 +102,22 @@ public class SalesUI
             AnsiConsole.WriteLine("Press any key to return to the previous menu ");
             Console.ReadKey();
             AnsiConsole.Clear();
-            return;
+            return false;
         }
         
         DisplaySaleResponses(response.Value);
+        return true;
     }
 
     public async Task HandleViewSaleByIdAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]View Sale Details[/]");
         AnsiConsole.MarkupLine("[green]Please choose a sale:[/]");
-        await HandleViewAllSalesAsync();
+
+        if (!await HandleViewAllSalesAsync())
+        {
+            return;
+        }
 
         var saleId = AnsiConsole.Ask<int>("Enter the Id of the sale to view: ");
 
@@ -133,7 +139,11 @@ public class SalesUI
     {
         AnsiConsole.MarkupLine("[bold]View Sale Details[/]");
         AnsiConsole.MarkupLine("[green]Please choose a sale:[/]");
-        await HandleViewAllSalesForUserAsync();
+
+        if (!await HandleViewAllSalesForUserAsync())
+        {
+            return;
+        }
 
         var saleId = AnsiConsole.Ask<int>("Enter the Id of the same to view: ");
 
@@ -157,8 +167,11 @@ public class SalesUI
         
 
         var productsUI = new ProductsUI(_productsApiService, _categoriesApiService);
-        
-        await productsUI.HandleViewAllProductsAsync();
+
+        if (!await productsUI.HandleViewAllProductsAsync())
+        {
+            return;
+        }
 
         var shoppingCart = new List<SaleItemRequest>();
 
@@ -243,7 +256,11 @@ public class SalesUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Update sale status[/]");
         AnsiConsole.MarkupLine($"[green]Choose one of the following sales:[/]");
-        await HandleViewAllSalesAsync();
+
+        if (!await HandleViewAllSalesAsync())
+        {
+            return;
+        }
 
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the sale whose status you wish to update: [/]");
         var status = GetSaleStatus();
@@ -275,7 +292,11 @@ public class SalesUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Refund a sale[/]");
         AnsiConsole.MarkupLine("[green]Choose one of the following sales: [/]");
-        await HandleViewAllSalesAsync();
+
+        if (!await HandleViewAllSalesAsync())
+        {
+            return;
+        }
 
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the sale that you wish to refund:[/] ");
 
@@ -301,7 +322,11 @@ public class SalesUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Cancel a sale[/]");
         AnsiConsole.MarkupLine("[green]Choose one of the following sales: [/]");
-        await HandleViewAllSalesAsync();
+
+        if (!await HandleViewAllSalesAsync())
+        {
+            return;
+        }
 
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the sale that you wish to cancel:[/]");
 
@@ -327,7 +352,11 @@ public class SalesUI
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Cancel a sale[/]");
         AnsiConsole.MarkupLine("[green]Choose one of the following sales: [/]");
-        await HandleViewAllSalesForUserAsync();
+
+        if (!await HandleViewAllSalesForUserAsync())
+        {
+            return;
+        }
 
         var id = AnsiConsole.Ask<int>("[green]Enter the id of the sale that you wish to cancel: [/]");
 
