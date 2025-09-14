@@ -124,6 +124,82 @@ public class AddressUI
         }
     }
 
+    public async Task HandleUpdateAddressAsync()
+    {
+        AnsiConsole.MarkupLine("[bold underline yellow]Update an address[/]");
+        AnsiConsole.WriteLine();
+
+        AnsiConsole.MarkupLine("[green]Please choose an address to update: [/]");
+        await HandleViewAllAddressesAsync();
+
+        var addressId = AnsiConsole.Ask<int>("Enter the Id of the address to update: ");
+
+        var addressToUpdateResult = await _addressApiService.GetAddressByIdAsync(addressId);
+
+        if (addressToUpdateResult.IsFailure || addressToUpdateResult.Value is null)
+        {
+            AnsiConsole.MarkupLine($"[red]{addressToUpdateResult.ErrorMessage}[/]");
+            AnsiConsole.MarkupLine("Press any key to continue: ");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+
+        var addressToUpdate = addressToUpdateResult.Value;
+
+        var streetNumber = AnsiConsole.Confirm("Update street number? ")
+            ? AnsiConsole.Ask<string>("Enter updated street number: ")
+            : addressToUpdate.StreetNumber;
+
+        var streetName = AnsiConsole.Confirm("Update street name? ")
+            ? AnsiConsole.Ask<string>("Enter updated street name: ")
+            : addressToUpdate.StreetName;
+
+        var city = AnsiConsole.Confirm("Update city? ")
+            ? AnsiConsole.Ask<string>("Enter updated city: ")
+            : addressToUpdate.City;
+
+        var state = AnsiConsole.Confirm("Update state? ")
+            ? AnsiConsole.Ask<string>("Enter updated state: ")
+            : addressToUpdate.State;
+
+        var country = AnsiConsole.Confirm("Update country? ")
+            ? AnsiConsole.Ask<string>("Enter updated country: ")
+            : addressToUpdate.Country;
+
+        var zipCode = AnsiConsole.Confirm("Update zip code? ")
+            ? AnsiConsole.Ask<string>("Enter updated zip code: ")
+            : addressToUpdate.ZipCode;
+
+        var request = new UpdateAddressRequest
+        {
+            StreetNumber = streetNumber,
+            StreetName = streetName,
+            City = city,
+            State = state,
+            Country = country,
+            ZipCode = zipCode
+        };
+
+        Result<AddressResponse?> addressResponseResult = null!;
+
+        await AnsiConsole.Status().StartAsync("Updating address...", async _ =>
+        {
+            addressResponseResult = await _addressApiService.UpdateAddressAsync(addressId, request);
+        });
+
+        if (addressResponseResult.IsSuccess && addressResponseResult.Value is not null)
+        {
+            var addressResponse = addressResponseResult.Value;
+            AnsiConsole.MarkupLine("[bold green]Address updated successfully![/]");
+            var title = "Updated address";
+            DisplayAddress(addressResponse, title);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
+        }
+    }
     public void DisplayAddresses(List<AddressResponse> addresses)
     {
         var table = new Table()
