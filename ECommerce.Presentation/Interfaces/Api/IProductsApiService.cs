@@ -2,7 +2,7 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Products.Request;
 using ECommerce.Presentation.Dtos.Products.Response;
 
-namespace ECommerce.Presentation.Interfaces;
+namespace ECommerce.Presentation.Interfaces.Api;
 
 public interface IProductsApiService
 {

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Request;
 
-namespace ECommerce.Presentation.Interfaces;
+namespace ECommerce.Presentation.Interfaces.Api;
 
 public interface ILoginApiService
 {

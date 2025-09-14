@@ -30,6 +30,6 @@ public enum CustomerMenu
     UpdateAddress,
     [Display(Name = "Delete an existing address in the system")]
     DeleteAddress,
-    [Display(Name = "Logout of the system")]
+    [Display(Name = "Logout of your account")]
     Logout,
 }

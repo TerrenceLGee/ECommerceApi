@@ -3,12 +3,13 @@ using ECommerce.Presentation.Dtos.Products.Request;
 using ECommerce.Presentation.Dtos.Products.Response;
 using ECommerce.Presentation.Enums;
 using ECommerce.Presentation.Enums.Extensions;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Products;
 
-public class ProductsUI
+public class ProductsUI : IProductsUI
 {
     private readonly IProductsApiService _productsApiService;
     private readonly ICategoriesApiService _categoriesApiService;

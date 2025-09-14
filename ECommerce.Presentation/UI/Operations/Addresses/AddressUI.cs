@@ -1,12 +1,13 @@
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Address.Request;
 using ECommerce.Presentation.Dtos.Address.Response;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Addresses;
 
-public class AddressUI
+public class AddressUI : IAddressUI
 {
     private readonly IAddressApiService _addressApiService;
 
@@ -237,7 +238,7 @@ public class AddressUI
             DisplayAddress(addressResponse, title);
         }
     }
-    public void DisplayAddresses(List<AddressResponse> addresses)
+    private void DisplayAddresses(List<AddressResponse> addresses)
     {
         var table = new Table()
             .Title("Your addresses")
@@ -271,7 +272,7 @@ public class AddressUI
         AnsiConsole.WriteLine();
     }
 
-    public void DisplayAddress(AddressResponse address, string title)
+    private void DisplayAddress(AddressResponse address, string title)
     {
         var table = new Table()
             .Title(title)

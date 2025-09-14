@@ -1,12 +1,12 @@
 using Spectre.Console;
 using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Dtos.Auth.Response;
-
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 
 namespace ECommerce.Presentation.UI.Operations.Users;
 
-public class UsersUI
+public class UsersUI : IUsersUI
 {
     private readonly IUserApiService _userApiService;
     private readonly IAddressApiService _addressApiService;

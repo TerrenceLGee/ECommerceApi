@@ -2,17 +2,18 @@ using System.Globalization;
 using System.Security.Claims;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Request;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Auth;
 
-public class Access
+public class AccessUI : IAccessUI
 {
     private readonly ILoginApiService _loginApiService;
     private const string DateFormat = "mm-dd-yyyy";
 
-    public Access(ILoginApiService loginApiService)
+    public AccessUI(ILoginApiService loginApiService)
     {
         _loginApiService = loginApiService;
     }

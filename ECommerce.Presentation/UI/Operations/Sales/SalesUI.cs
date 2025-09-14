@@ -4,14 +4,15 @@ using ECommerce.Presentation.Dtos.Sales.Request;
 using ECommerce.Presentation.Dtos.Sales.Response;
 using ECommerce.Presentation.Enums;
 using ECommerce.Presentation.Enums.Extensions;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 using ECommerce.Presentation.UI.Operations.Addresses;
 using ECommerce.Presentation.UI.Operations.Products;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Sales;
 
-public class SalesUI
+public class SalesUI : ISalesUI
 {
     private readonly ISalesApiService _salesApiService;
     private readonly IProductsApiService _productsApiService;
@@ -288,7 +289,7 @@ public class SalesUI
         }
     }
 
-    public async Task HandleRefundSale()
+    public async Task HandleRefundSaleAsync()
     {
         AnsiConsole.MarkupLine("[bold underline yellow]Refund a sale[/]");
         AnsiConsole.MarkupLine("[green]Choose one of the following sales: [/]");

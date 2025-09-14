@@ -42,6 +42,6 @@ public enum AdminMenu
     ViewUserById,
     [Display(Name = "View all addresses of a user")]
     ViewUserAddress,
-    [Display(Name = "Logout of the system")]
+    [Display(Name = "Logout of your account")]
     Logout,
 }

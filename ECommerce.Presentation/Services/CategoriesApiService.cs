@@ -3,7 +3,7 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Categories.Request;
 using ECommerce.Presentation.Dtos.Categories.Response;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Presentation.Services;

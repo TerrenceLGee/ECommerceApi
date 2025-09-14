@@ -1,11 +1,10 @@
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Products.Request;
 using ECommerce.Presentation.Dtos.Products.Response;
-using ECommerce.Presentation.Dtos.Shared.Pagination;
-using ECommerce.Presentation.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ECommerce.Presentation.Interfaces.Api;
 
 namespace ECommerce.Presentation.Services;
 

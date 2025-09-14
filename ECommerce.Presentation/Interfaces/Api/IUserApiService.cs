@@ -2,7 +2,7 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Dtos.Auth.Response;
 
-namespace ECommerce.Presentation.Interfaces;
+namespace ECommerce.Presentation.Interfaces.Api;
 
 public interface IUserApiService
 {

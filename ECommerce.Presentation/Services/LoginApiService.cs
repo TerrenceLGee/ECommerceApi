@@ -8,7 +8,7 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Errors;
 using ECommerce.Presentation.Dtos.Auth.Request;
 using ECommerce.Presentation.Dtos.Auth.Response;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 

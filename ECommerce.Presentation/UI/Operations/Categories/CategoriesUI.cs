@@ -2,12 +2,13 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Categories.Request;
 using ECommerce.Presentation.Dtos.Categories.Response;
 using ECommerce.Presentation.Dtos.Products.Response;
-using ECommerce.Presentation.Interfaces;
+using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.UI;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Categories;
 
-public class CategoriesUI
+public class CategoriesUI : ICategoriesUI
 {
     private readonly ICategoriesApiService _categoryApiService;
     private readonly IProductsApiService _productsApiService;

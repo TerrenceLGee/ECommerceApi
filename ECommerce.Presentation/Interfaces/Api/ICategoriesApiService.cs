@@ -2,7 +2,7 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Categories.Request;
 using ECommerce.Presentation.Dtos.Categories.Response;
 
-namespace ECommerce.Presentation.Interfaces;
+namespace ECommerce.Presentation.Interfaces.Api;
 
 public interface ICategoriesApiService
 {
