@@ -200,6 +200,43 @@ public class AddressUI
             AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
         }
     }
+
+    public async Task HandleDeleteAddressAsync()
+    {
+        AnsiConsole.MarkupLine("[bold underline yellow]Delete an address[/]");
+        AnsiConsole.WriteLine();
+
+        AnsiConsole.MarkupLine("[green]Please choose an address to delete: [/]");
+        await HandleViewAllAddressesAsync();
+
+        var addressId = AnsiConsole.Ask<int>("Enter the Id of the address to delete: ");
+
+        var addressToDeleteResult = await _addressApiService.GetAddressByIdAsync(addressId);
+
+        if (addressToDeleteResult.IsFailure || addressToDeleteResult.Value is null)
+        {
+            AnsiConsole.MarkupLine($"[red]{addressToDeleteResult.ErrorMessage}[/]");
+            AnsiConsole.MarkupLine("Press any key to continue: ");
+            Console.ReadKey();
+            AnsiConsole.Clear();
+            return;
+        }
+
+        Result<AddressResponse?> addressResponseResult = null!;
+
+        await AnsiConsole.Status().StartAsync("Deleting address....", async _ =>
+        {
+            addressResponseResult = await _addressApiService.DeleteAddressAsync(addressId);
+        });
+
+        if (addressResponseResult.IsSuccess && addressResponseResult.Value is not null)
+        {
+            var addressResponse = addressResponseResult.Value;
+            AnsiConsole.MarkupLine("[bold green]Address deleted successfully![/]");
+            var title = "Deleted address";
+            DisplayAddress(addressResponse, title);
+        }
+    }
     public void DisplayAddresses(List<AddressResponse> addresses)
     {
         var table = new Table()
