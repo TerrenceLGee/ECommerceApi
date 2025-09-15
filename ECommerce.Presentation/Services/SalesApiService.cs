@@ -3,6 +3,7 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Sales.Request;
 using ECommerce.Presentation.Dtos.Sales.Response;
+using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces.Api;
 using Microsoft.Extensions.Logging;
 
@@ -207,8 +208,15 @@ public class SalesApiService : ISalesApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<SaleResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<SaleResponse>>(options);
 
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading sales from Json");
+                return Result<List<SaleResponse>?>.Fail("Error reading sales from Json");
+            }
+
+            var results = resultsPaged.Items;
             return Result<List<SaleResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
@@ -248,8 +256,15 @@ public class SalesApiService : ISalesApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<SaleResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<SaleResponse>>(options);
 
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading sales from Json");
+                return Result<List<SaleResponse>?>.Fail("Error reading sales from Json");
+            }
+
+            var results = resultsPaged.Items;
             return Result<List<SaleResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)

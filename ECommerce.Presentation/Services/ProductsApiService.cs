@@ -4,6 +4,7 @@ using ECommerce.Presentation.Dtos.Products.Response;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces.Api;
 
 namespace ECommerce.Presentation.Services;
@@ -37,8 +38,15 @@ public class ProductsApiService : IProductsApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<ProductResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<ProductResponse>>(options);
 
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading products from Json");
+                return Result<List<ProductResponse>?>.Fail("Error reading products from Json");
+            }
+
+            var results = resultsPaged.Items;
             return Result<List<ProductResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)

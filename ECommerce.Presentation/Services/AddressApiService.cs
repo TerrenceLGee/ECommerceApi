@@ -3,6 +3,7 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Address.Request;
 using ECommerce.Presentation.Dtos.Address.Response;
+using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces.Api;
 using Microsoft.Extensions.Logging;
 
@@ -125,9 +126,17 @@ public class AddressApiService : IAddressApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<AddressResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<AddressResponse>>(options);
 
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading addresses from Json");
+                return Result<List<AddressResponse>?>.Fail("Error reading addresses from Json");
+            }
+            
+            var results = resultsPaged.Items;
             return Result<List<AddressResponse>?>.Ok(results);
+          
         }
         catch (UriFormatException ex)
         {
@@ -165,8 +174,15 @@ public class AddressApiService : IAddressApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<AddressResponse>>(options);
-
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<AddressResponse>>(options);
+            
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading addresses from Json");
+                return Result<List<AddressResponse>?>.Fail("Error reading addresses from Json");
+            }
+            
+            var results = resultsPaged.Items;
             return Result<List<AddressResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)

@@ -3,6 +3,7 @@ using System.Text.Json;
 using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Categories.Request;
 using ECommerce.Presentation.Dtos.Categories.Response;
+using ECommerce.Presentation.Dtos.Shared.Pagination;
 using ECommerce.Presentation.Interfaces.Api;
 using Microsoft.Extensions.Logging;
 
@@ -37,8 +38,15 @@ public class CategoriesApiService : ICategoriesApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<CategoryResponse>>(options);
+
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading categories from Json");
+                return Result<List<CategoryResponse>?>.Fail("Error reading categories from Json");
+            }
             
+            var results = resultsPaged.Items;
             return Result<List<CategoryResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
@@ -77,8 +85,15 @@ public class CategoriesApiService : ICategoriesApiService
             }
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var results = await response.Content.ReadFromJsonAsync<List<CategoryResponse>>(options);
+            var resultsPaged = await response.Content.ReadFromJsonAsync<PagedList<CategoryResponse>>(options);
 
+            if (resultsPaged is null)
+            {
+                _logger.LogError("Error reading categories from Json");
+                return Result<List<CategoryResponse>?>.Fail("Error reading categories from Json");
+            }
+            
+            var results = resultsPaged.Items;
             return Result<List<CategoryResponse>?>.Ok(results);
         }
         catch (UriFormatException ex)
