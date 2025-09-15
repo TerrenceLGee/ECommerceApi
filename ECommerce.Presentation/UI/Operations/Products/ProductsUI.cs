@@ -321,12 +321,15 @@ public class ProductsUI : IProductsUI
         table.AddColumn("Stock Keeping Unit");
         table.AddColumn("Price");
         table.AddColumn("Discount Percentage");
+        table.AddColumn("Final Price");
         table.AddColumn("Quantity In Stock");
         table.AddColumn("Is Active?");
         table.AddColumn("In Category");
 
         foreach (var product in products)
         {
+            var finalPriceCalculated = product.Price - (product.Price * (int)product.Discount);
+            
             table.AddRow(
                 product.Id.ToString(),
                 product.Name,
@@ -334,6 +337,7 @@ public class ProductsUI : IProductsUI
                 product.StockKeepingUnit ?? "N/A",
                 $"${product.Price:F2}",
                 $"{(int)product.Discount}%",
+                $"${finalPriceCalculated:F2}",
                 $"{product.StockQuantity}",
                 $"{product.IsActive}",
                 $"{product.Category.Name}");
@@ -355,16 +359,20 @@ public class ProductsUI : IProductsUI
         table.AddColumn("Stock Keeping Unit");
         table.AddColumn("Price");
         table.AddColumn("Discount Percentage");
+        table.AddColumn("Final Price");
         table.AddColumn("Quantity In Stock");
         table.AddColumn("Is Active?");
         table.AddColumn("In Category");
 
+        var finalPriceCalculated = productResponse.Price - (productResponse.Price * (int)productResponse.Discount);
+        
         var id = productResponse.Id.ToString();
         var name = productResponse.Name;
         var description = productResponse.Description ?? "N/A";
         var stockKeepingUnit = productResponse.StockKeepingUnit ?? "N/A";
         var price = $"${productResponse.Price:F2}";
         var discount = $"{(int)productResponse.Discount}%";
+        var finalPrice = $"${finalPriceCalculated:F2}";
         var quantity = $"{productResponse.StockQuantity}";
         var isActive = $"{productResponse.IsActive}";
         var category = $"{productResponse.Category.Name}";
@@ -376,6 +384,7 @@ public class ProductsUI : IProductsUI
             stockKeepingUnit,
             price,
             discount,
+            finalPrice,
             quantity,
             isActive,
             category);

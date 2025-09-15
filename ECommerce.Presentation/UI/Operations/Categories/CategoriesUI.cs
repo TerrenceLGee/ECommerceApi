@@ -11,14 +11,10 @@ namespace ECommerce.Presentation.UI.Operations.Categories;
 public class CategoriesUI : ICategoriesUI
 {
     private readonly ICategoriesApiService _categoryApiService;
-    private readonly IProductsApiService _productsApiService;
-
     public CategoriesUI(
-        ICategoriesApiService categoryApiService,
-        IProductsApiService productsApiService)
+        ICategoriesApiService categoryApiService)
     {
         _categoryApiService = categoryApiService;
-        _productsApiService = productsApiService;
     }
 
     public async Task<bool> HandleViewAllCategoriesAsync()
@@ -73,7 +69,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (result.IsSuccess && result.Value is not null)
         {
-            await DisplayCategoryResponse(result.Value, $"Category information");
+            DisplayCategoryResponse(result.Value, $"Category information");
         }
         else
         {
@@ -108,7 +104,7 @@ public class CategoriesUI : ICategoriesUI
             
             AnsiConsole.MarkupLine("[bold green]Category added successfully![/]");
             var title = "Newly added category";
-            await DisplayCategoryResponse(categoryResponse, title);
+            DisplayCategoryResponse(categoryResponse, title);
         }
         else
         {
@@ -177,7 +173,7 @@ public class CategoriesUI : ICategoriesUI
 
             AnsiConsole.MarkupLine("[bold green]Category updated successfully![/]");
             var title = "Updated category";
-            await DisplayCategoryResponse(categoryResponse, title);
+            DisplayCategoryResponse(categoryResponse, title);
         }
         else
         {
@@ -235,7 +231,7 @@ public class CategoriesUI : ICategoriesUI
             var categoryResponse = categoryResponseResult.Value;
             AnsiConsole.MarkupLine("[bold green]Category deleted successfully![/]");
             var title = "Deleted category";
-            await DisplayCategoryResponse(categoryResponse, title);
+            DisplayCategoryResponse(categoryResponse, title);
         }
         else
         {
@@ -280,7 +276,7 @@ public class CategoriesUI : ICategoriesUI
         AnsiConsole.WriteLine();
     }
 
-    private async Task DisplayCategoryResponse(CategoryResponse response, string title)
+    private void DisplayCategoryResponse(CategoryResponse response, string title)
     {
         var table = new Table()
             .Title(title)
@@ -300,36 +296,9 @@ public class CategoriesUI : ICategoriesUI
         AnsiConsole.Write(table);
         AnsiConsole.WriteLine();
 
-        var countOfProducts = response.Products.Count;
-        
-        AnsiConsole.MarkupLine($"There are {countOfProducts} products available to view");
-        
-        var pageNumber = AnsiConsole.Confirm("Would you like to specify the page number to view? (default is 1): ")
-            ? AnsiConsole.Ask<int>("Enter page number to view")
-            : 1;
-        var pageSize = AnsiConsole.Confirm("Would you like to specify the max number of pages? (default is 10): ")
-            ? AnsiConsole.Ask<int>("Enter number of pages to view")
-            : 10;
-        
-        var productsListResult = await _productsApiService.GetProductsAsync(pageNumber, pageSize);
-        
+        var productsList = response.Products;
 
-        if (productsListResult.IsFailure)
-        {
-            AnsiConsole.MarkupLine($"[red]{productsListResult.ErrorMessage}[/]");
-        }
-        else
-        {
-            var productsList = productsListResult.Value!;
-
-            if (productsList is null || productsList.Count == 0)
-            {
-                AnsiConsole.MarkupLine("[bold green]Currently there are no products in this category[/]");
-                return;
-            }
-
-            DisplayProductsOfCategory(productsList, $"Products under the category {response.Name}");
-        }
+        DisplayProductsOfCategory(productsList, $"Products under the category {response.Name}");
     }
 
     private void DisplayProductsOfCategory(List<ProductResponse> products, string title)

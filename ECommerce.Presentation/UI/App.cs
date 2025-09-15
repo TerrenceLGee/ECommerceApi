@@ -32,7 +32,7 @@ public class App : IApp
 
     public async Task RunAsync()
     {
-        AnsiConsole.MarkupLine("[bold underline yellow]Welcome to the E-Commerce Client![/]");
+        AnsiConsole.MarkupLine("[bold underline yellow]Welcome to the E-Commerce Client Home Page![/]");
         
         var exitSystem = false;
 

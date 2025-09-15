@@ -11,6 +11,7 @@ public class ProductResponse
     public string? StockKeepingUnit { get; set; }
     public decimal Price { get; set; }
     public DiscountStatus Discount { get; set; }
+    public decimal FinalPrice { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
     public CategoryResponse Category { get; set; } = null!;

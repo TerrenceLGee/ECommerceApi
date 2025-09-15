@@ -25,6 +25,10 @@ catch (Exception ex)
 {
     Log.Fatal($"Application terminated unexpectedly: {ex.Message}");
 }
+finally
+{
+    Log.CloseAndFlush();
+}
 
 
 
@@ -35,8 +39,8 @@ async Task Startup()
         .ConfigureLogging((_, log) => log.AddSerilog(dispose: true))
         .ConfigureServices((ctx, services) =>
         {
-            // var baseUrl = ctx.Configuration["ApiSettings:BaseUrl"]!;
-            var baseUrl = "https://localhost:7197/";
+            var baseUrl = ctx.Configuration["ApiSettings:BaseUrl"]!;
+            // var baseUrl = "https://localhost:7197/";
 
             services.AddScoped<IAddressApiService, AddressApiService>();
             services.AddScoped<ICategoriesApiService, CategoriesApiService>();
