@@ -4,6 +4,7 @@ using ECommerce.Presentation.Common.Results;
 using ECommerce.Presentation.Dtos.Auth.Request;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Auth;
@@ -75,7 +76,7 @@ public class AccessUI : IAccessUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[bold red]Unable to register you at this time...\n{registered.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"Unable to register you at this time...\n{registered.ErrorMessage}");
         }
     }
 
@@ -105,7 +106,7 @@ public class AccessUI : IAccessUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[bold red]Login failed. Please check your credentials: {successResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"Login failed. Please check your credentials: {successResult.ErrorMessage}");
         }
 
         if (successResult.IsSuccess && !string.IsNullOrEmpty(_loginApiService.JwtToken))

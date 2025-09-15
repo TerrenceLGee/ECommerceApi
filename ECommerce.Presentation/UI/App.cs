@@ -85,18 +85,18 @@ public class App : IApp
                     AnsiConsole.MarkupLine("[yellow]Logging out...[/]");
                     return;
             }
-
-            if (isAdmin)
-            {
-                await AdminLoop();
-            }
-            else
-            {
-                await CustomerLoop();
-            }
-
-            AnsiConsole.MarkupLine("\n[yellow]You have been logged out.[/]");
         }
+        
+        if (isAdmin)
+        {
+            await AdminLoop();
+        }
+        else
+        {
+            await CustomerLoop();
+        }
+
+        AnsiConsole.MarkupLine("\n[yellow]You have been logged out.[/]");
         ClearTheScreen();
     }
 

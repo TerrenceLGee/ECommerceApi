@@ -10,5 +10,5 @@ public class UserResponse
     public string EmailAddress { get; set; } = string.Empty;
     public DateOnly BirthDate { get; set; }
     public int Age { get; set; }
-    public List<AddressResponse> Addresses = new();
+    public List<AddressResponse> Addresses { get; set; } = new();
 }

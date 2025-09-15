@@ -5,6 +5,7 @@ using ECommerce.Presentation.Enums;
 using ECommerce.Presentation.Enums.Extensions;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Products;
@@ -28,10 +29,7 @@ public class ProductsUI : IProductsUI
 
         if (countOfProductsResult.IsFailure || countOfProductsResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no products available to view[/]");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no products available to view");
             return false;
         }
         
@@ -49,10 +47,7 @@ public class ProductsUI : IProductsUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
         
@@ -76,10 +71,7 @@ public class ProductsUI : IProductsUI
 
         if (productResult.IsFailure || productResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{productResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{productResult.ErrorMessage}");
             return;
         }
         
@@ -92,9 +84,7 @@ public class ProductsUI : IProductsUI
 
         if (productResult.IsFailure || productResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{productResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to continue: ");
-            Console.ReadKey();
+            UIHelper.PrintMessageAndContinue($"{productResult.ErrorMessage}");
             return;
         }
         
@@ -148,7 +138,7 @@ public class ProductsUI : IProductsUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{productResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{productResponseResult.ErrorMessage}");
         }
     }
 
@@ -168,10 +158,7 @@ public class ProductsUI : IProductsUI
 
         if (productResult.IsFailure || productResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{productResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{productResult.ErrorMessage}");
             return;
         }
 
@@ -254,7 +241,7 @@ public class ProductsUI : IProductsUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{productResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{productResponseResult.ErrorMessage}");
         }
     }
 
@@ -274,10 +261,7 @@ public class ProductsUI : IProductsUI
 
         if (productToDeleteResult.IsFailure || productToDeleteResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{productToDeleteResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{productToDeleteResult.ErrorMessage}");
             return;
         }
 
@@ -297,17 +281,14 @@ public class ProductsUI : IProductsUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{productToDeleteResponse.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{productToDeleteResponse.ErrorMessage}");
         }
     }
     private void DisplayProducts(List<ProductResponse> products)
     {
         if (products.Count == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no products available[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no products available");
             return;
         }
 
@@ -328,7 +309,7 @@ public class ProductsUI : IProductsUI
 
         foreach (var product in products)
         {
-            var finalPriceCalculated = product.Price - (product.Price * (int)product.Discount);
+            var finalPriceCalculated = product.Price - (product.Price * ((decimal)product.Discount / 100));
             
             table.AddRow(
                 product.Id.ToString(),
@@ -364,7 +345,7 @@ public class ProductsUI : IProductsUI
         table.AddColumn("Is Active?");
         table.AddColumn("In Category");
 
-        var finalPriceCalculated = productResponse.Price - (productResponse.Price * (int)productResponse.Discount);
+        var finalPriceCalculated = productResponse.Price - (productResponse.Price * ((decimal)productResponse.Discount / 100));
         
         var id = productResponse.Id.ToString();
         var name = productResponse.Name;
@@ -399,10 +380,7 @@ public class ProductsUI : IProductsUI
 
         if (categoriesResult.IsFailure || categoriesResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{categoriesResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{categoriesResult.ErrorMessage}");
             return false;
         }
 

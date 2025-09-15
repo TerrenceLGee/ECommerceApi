@@ -3,6 +3,7 @@ using ECommerce.Presentation.Dtos.Address.Request;
 using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Addresses;
@@ -24,10 +25,7 @@ public class AddressUI : IAddressUI
 
         if (countOfAddressesResult.IsFailure || countOfAddressesResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no addresses available to display[/]");
-            AnsiConsole.WriteLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no addresses available to display");
             return false;
         }
 
@@ -45,10 +43,7 @@ public class AddressUI : IAddressUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
         
@@ -72,10 +67,7 @@ public class AddressUI : IAddressUI
 
         if (addressResponseResult.IsFailure || addressResponseResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{addressResponseResult.ErrorMessage}");
             return;
         }
 
@@ -121,7 +113,7 @@ public class AddressUI : IAddressUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{addressResponseResult.ErrorMessage}");
         }
     }
 
@@ -139,10 +131,7 @@ public class AddressUI : IAddressUI
 
         if (addressToUpdateResult.IsFailure || addressToUpdateResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{addressToUpdateResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{addressToUpdateResult.ErrorMessage}");
             return;
         }
 
@@ -198,7 +187,7 @@ public class AddressUI : IAddressUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{addressResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{addressResponseResult.ErrorMessage}");
         }
     }
 
@@ -216,10 +205,7 @@ public class AddressUI : IAddressUI
 
         if (addressToDeleteResult.IsFailure || addressToDeleteResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{addressToDeleteResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{addressToDeleteResult.ErrorMessage}");
             return;
         }
 
@@ -236,6 +222,10 @@ public class AddressUI : IAddressUI
             AnsiConsole.MarkupLine("[bold green]Address deleted successfully![/]");
             var title = "Deleted address";
             DisplayAddress(addressResponse, title);
+        }
+        else
+        {
+            UIHelper.PrintMessageAndContinue($"{addressResponseResult.ErrorMessage}");
         }
     }
     private void DisplayAddresses(List<AddressResponse> addresses)

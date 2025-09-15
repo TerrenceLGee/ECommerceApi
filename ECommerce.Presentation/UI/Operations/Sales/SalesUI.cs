@@ -6,6 +6,7 @@ using ECommerce.Presentation.Enums;
 using ECommerce.Presentation.Enums.Extensions;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 using ECommerce.Presentation.UI.Operations.Addresses;
 using ECommerce.Presentation.UI.Operations.Products;
 using Spectre.Console;
@@ -39,10 +40,7 @@ public class SalesUI : ISalesUI
 
         if (salesCountResult.IsFailure || salesCountResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no sales available to display[/]");
-            AnsiConsole.WriteLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no sales available to display");
             return false;
         }
         
@@ -60,10 +58,7 @@ public class SalesUI : ISalesUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
         
@@ -78,10 +73,7 @@ public class SalesUI : ISalesUI
         
         if (salesCountResult.IsFailure || salesCountResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no sales available to display[/]");
-            AnsiConsole.WriteLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no sales available to display");
             return false;
         }
         
@@ -99,10 +91,7 @@ public class SalesUI : ISalesUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
         
@@ -126,10 +115,7 @@ public class SalesUI : ISalesUI
 
         if (saleResponseResult.IsFailure || saleResponseResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{saleResponseResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{saleResponseResult.ErrorMessage}");
             return;
         }
         
@@ -152,10 +138,7 @@ public class SalesUI : ISalesUI
 
         if (saleResponseResult.IsFailure || saleResponseResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{saleResponseResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{saleResponseResult.ErrorMessage}");
             return;
         }
         
@@ -165,7 +148,6 @@ public class SalesUI : ISalesUI
     public async Task HandleCreateSaleAsync()
     {
         AnsiConsole.MarkupLine("[bold]Create a New Sale[/]");
-        
 
         var productsUI = new ProductsUI(_productsApiService, _categoriesApiService);
 
@@ -249,7 +231,7 @@ public class SalesUI : ISalesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{saleResponseResult.Value}[/]");
+            UIHelper.PrintMessageAndContinue($"{saleResponseResult.Value}");
         }
     }
 
@@ -285,7 +267,7 @@ public class SalesUI : ISalesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{responseMessageResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{responseMessageResult.ErrorMessage}");
         }
     }
 
@@ -315,7 +297,7 @@ public class SalesUI : ISalesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{responseMessageResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{responseMessageResult.ErrorMessage}");
         }
     }
 
@@ -345,7 +327,7 @@ public class SalesUI : ISalesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{responseMessageResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{responseMessageResult.ErrorMessage}");
         }
     }
 
@@ -375,7 +357,7 @@ public class SalesUI : ISalesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{responseMessageResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{responseMessageResult.ErrorMessage}");
         }
     }
     
@@ -394,11 +376,14 @@ public class SalesUI : ISalesUI
         table.AddColumn("Total");
 
         
+        
         foreach (var sale in sales)
         {
             var updatedAtString = sale.UpdatedAt.HasValue
                 ? sale.UpdatedAt.Value.ToString(DateFormat)
                 : "N/A";
+
+            var total = sale.SaleItems.Sum(si => si.FinalPrice);
             
             table.AddRow(
                 sale.Id.ToString(),
@@ -407,7 +392,7 @@ public class SalesUI : ISalesUI
                 sale.CustomerId,
                 $"{sale.Status.GetDisplayName()}",
                 sale.Notes ?? "N/A",
-                $"${sale.Total:F2}");
+                $"${total:F2}");
         }
 
         AnsiConsole.Write(table);
@@ -428,6 +413,7 @@ public class SalesUI : ISalesUI
         table.AddColumn("Notes");
         table.AddColumn("Total");
 
+
         var saleId = $"{sale.Id}";
         var createdAt = $"{sale.CreatedAt.ToString(DateFormat)}";
         var updatedAtString = sale.UpdatedAt.HasValue
@@ -436,7 +422,8 @@ public class SalesUI : ISalesUI
         var customerId = sale.CustomerId;
         var status = $"{sale.Status.GetDisplayName()}";
         var notes = sale.Notes ?? "N/A";
-        var total = $"${sale.Total:F2}";
+        var total = sale.SaleItems.Sum(si => si.FinalPrice);
+        var totalString = $"${total:F2}";
 
         table.AddRow(
             saleId,
@@ -445,7 +432,7 @@ public class SalesUI : ISalesUI
             customerId,
             status,
             notes,
-            total);
+            totalString);
 
         AnsiConsole.Write(table);
         AnsiConsole.WriteLine();
@@ -460,10 +447,7 @@ public class SalesUI : ISalesUI
     {
         if (saleProducts.Count == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no items available[/]");
-            AnsiConsole.WriteLine("Press any key to return to previous menu: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no items available");
             return;
         }
 

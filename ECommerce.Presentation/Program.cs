@@ -39,8 +39,7 @@ async Task Startup()
         .ConfigureLogging((_, log) => log.AddSerilog(dispose: true))
         .ConfigureServices((ctx, services) =>
         {
-            var baseUrl = ctx.Configuration["ApiSettings:BaseUrl"]!;
-            // var baseUrl = "https://localhost:7197/";
+            var baseUrl = ctx.Configuration["ApiSettings:BaseUrl"];
 
             services.AddScoped<IAddressApiService, AddressApiService>();
             services.AddScoped<ICategoriesApiService, CategoriesApiService>();

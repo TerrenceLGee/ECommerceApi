@@ -3,21 +3,19 @@ using ECommerce.Presentation.Dtos.Address.Response;
 using ECommerce.Presentation.Dtos.Auth.Response;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 
 namespace ECommerce.Presentation.UI.Operations.Users;
 
 public class UsersUI : IUsersUI
 {
     private readonly IUserApiService _userApiService;
-    private readonly IAddressApiService _addressApiService;
     private const string DateFormat = "MM/dd/yyyy";
 
     public UsersUI(
-        IUserApiService userApiService,
-        IAddressApiService addressApiService)
+        IUserApiService userApiService)
     {
         _userApiService = userApiService;
-        _addressApiService = addressApiService;
     }
 
 
@@ -30,10 +28,7 @@ public class UsersUI : IUsersUI
 
         if (countOfUsersResult.IsFailure || countOfUsersResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no users available to display[/]");
-            AnsiConsole.WriteLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no users available to display");
             return false;
         }
 
@@ -51,10 +46,7 @@ public class UsersUI : IUsersUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
 
@@ -78,10 +70,7 @@ public class UsersUI : IUsersUI
 
         if (userResponseResult.IsFailure || userResponseResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{userResponseResult.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{userResponseResult.ErrorMessage}");
             return;
         }
         
@@ -105,10 +94,7 @@ public class UsersUI : IUsersUI
 
         if (userResult.IsFailure || userResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{userResult.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to continue: ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{userResult.ErrorMessage}");
             return;
         }
 
@@ -116,10 +102,7 @@ public class UsersUI : IUsersUI
 
         if (userAddressCount == 0)
         {
-            AnsiConsole.MarkupLine($"[red]There are no addresses associated with user #{userId}");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"There are no addresses associated with user - {userId}");
             return;
         }
 
@@ -137,10 +120,7 @@ public class UsersUI : IUsersUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return;
         }
         

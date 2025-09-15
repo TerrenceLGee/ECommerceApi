@@ -4,6 +4,7 @@ using ECommerce.Presentation.Dtos.Categories.Response;
 using ECommerce.Presentation.Dtos.Products.Response;
 using ECommerce.Presentation.Interfaces.Api;
 using ECommerce.Presentation.Interfaces.UI;
+using ECommerce.Presentation.UI.Helpers;
 using Spectre.Console;
 
 namespace ECommerce.Presentation.UI.Operations.Categories;
@@ -23,10 +24,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (countOfCategoriesResult.IsFailure || countOfCategoriesResult.Value == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no categories available to view[/]");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no categories available to view");
             return false;
         }
         
@@ -43,10 +41,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (response.IsFailure || response.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{response.ErrorMessage}[/]");
-            AnsiConsole.WriteLine("Press any key to return to the previous menu ");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{response.ErrorMessage}");
             return false;
         }
         
@@ -73,7 +68,7 @@ public class CategoriesUI : ICategoriesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]{result.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{result.ErrorMessage}");
         }
     }
 
@@ -108,7 +103,7 @@ public class CategoriesUI : ICategoriesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[bold red]Failed to add category to the database: {categoryResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"Failed to add category to the database: {categoryResponseResult.ErrorMessage}");
         }
     }
 
@@ -131,10 +126,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (categoryToUpdateResult.IsFailure || categoryToUpdateResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"{categoryToUpdateResult.ErrorMessage}");
-            AnsiConsole.MarkupLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"{categoryToUpdateResult.ErrorMessage}");
             return;
         }
 
@@ -177,7 +169,7 @@ public class CategoriesUI : ICategoriesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[red]Failed to update category in the database: {categoryResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{categoryResponseResult.ErrorMessage}");
         }
     }
 
@@ -200,9 +192,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (categoryToDeleteResult.IsFailure || categoryToDeleteResult.Value is null)
         {
-            AnsiConsole.MarkupLine($"[red]{categoryToDeleteResult.ErrorMessage}[/]");
-            AnsiConsole.MarkupLine("Press any key to continue");
-            Console.ReadKey();
+            UIHelper.PrintMessageAndContinue($"{categoryToDeleteResult.ErrorMessage}");
             return;
         }
 
@@ -212,10 +202,7 @@ public class CategoriesUI : ICategoriesUI
 
         if (!confirmDeleteCategory)
         {
-            AnsiConsole.MarkupLine($"[bold red]Category {categoryToDelete.Name} will NOT be deleted[/]");
-            AnsiConsole.WriteLine("Press any key to continue");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue($"Category {categoryToDelete.Name} will NOT be deleted");
             return;
         }
 
@@ -235,17 +222,14 @@ public class CategoriesUI : ICategoriesUI
         }
         else
         {
-            AnsiConsole.MarkupLine($"[bold red]{categoryResponseResult.ErrorMessage}[/]");
+            UIHelper.PrintMessageAndContinue($"{categoryResponseResult.ErrorMessage}");
         }
     }
     private void DisplayCategories(List<CategoryResponse> categories)
     {
         if (categories.Count == 0)
         {
-            AnsiConsole.MarkupLine("[red]There are no categories available to view[]");
-            AnsiConsole.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-            AnsiConsole.Clear();
+            UIHelper.PrintMessageAndContinue("There are no categories available to view");
             return;
         }
 
