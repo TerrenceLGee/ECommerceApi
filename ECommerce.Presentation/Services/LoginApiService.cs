@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
@@ -9,6 +8,7 @@ using ECommerce.Presentation.Dtos.Auth.Errors;
 using ECommerce.Presentation.Dtos.Auth.Request;
 using ECommerce.Presentation.Dtos.Auth.Response;
 using ECommerce.Presentation.Interfaces.Api;
+using ECommerce.Presentation.Interfaces.Auth;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,14 +17,17 @@ namespace ECommerce.Presentation.Services;
 public class LoginApiService : ILoginApiService
 {
     private readonly HttpClient _httpClient;
+    private readonly IAuthTokenHolder _tokenHolder;
     private readonly ILogger<LoginApiService> _logger;
     public string? JwtToken { get; set; }
     
     public LoginApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
+        IAuthTokenHolder tokenHolder,
         ILogger<LoginApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
+        _tokenHolder = tokenHolder;
         _logger = logger;
     }
     
@@ -36,6 +39,7 @@ public class LoginApiService : ILoginApiService
 
             if (!response.IsSuccessStatusCode)
             {
+                _tokenHolder.SetToken(null);
                 _logger.LogError("Login failed returned: {statusCode}.", response.StatusCode);
                 return Result.Fail($"Login failed returned: {response.StatusCode}");
             }
@@ -44,13 +48,13 @@ public class LoginApiService : ILoginApiService
 
             if (authResponse?.Token is null)
             {
+                _tokenHolder.SetToken(null);
                 _logger.LogError("Login token invalid");
                 return Result.Fail("Login token invalid");
             }
 
+            _tokenHolder.SetToken(authResponse.Token);
             JwtToken = authResponse.Token;
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", JwtToken);
 
             return Result.Ok();
         }

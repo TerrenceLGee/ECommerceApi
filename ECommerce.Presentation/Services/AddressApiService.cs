@@ -14,10 +14,10 @@ public class AddressApiService : IAddressApiService
     private readonly ILogger<AddressApiService> _logger;
     
     public AddressApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILogger<AddressApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
         _logger = logger;
     }
 

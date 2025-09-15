@@ -14,10 +14,10 @@ public class ProductsApiService : IProductsApiService
     private readonly ILogger<ProductsApiService> _logger;
 
     public ProductsApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILogger<ProductsApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
         _logger = logger;
     }
     

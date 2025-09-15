@@ -14,10 +14,10 @@ public class UserApiService : IUserApiService
     private readonly ILogger<UserApiService> _logger;
 
     public UserApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILogger<UserApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
         _logger = logger;
     }
     

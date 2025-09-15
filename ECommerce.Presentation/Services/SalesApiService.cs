@@ -14,10 +14,10 @@ public class SalesApiService : ISalesApiService
     private readonly ILogger<SalesApiService> _logger;
 
     public SalesApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILogger<SalesApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
         _logger = logger;
     }
     

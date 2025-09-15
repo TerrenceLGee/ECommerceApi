@@ -14,10 +14,10 @@ public class CategoriesApiService : ICategoriesApiService
     private readonly ILogger<CategoriesApiService> _logger;
 
     public CategoriesApiService(
-        HttpClient httpClient,
+        IHttpClientFactory httpClientFactory,
         ILogger<CategoriesApiService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClientFactory.CreateClient("Client");
         _logger = logger;
     }
     

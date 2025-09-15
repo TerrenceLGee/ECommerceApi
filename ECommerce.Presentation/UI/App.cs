@@ -5,7 +5,7 @@ using Spectre.Console;
 
 namespace ECommerce.Presentation.UI;
 
-public class App
+public class App : IApp
 {
     private readonly IAccessUI _access;
     private readonly IProductsUI _products;
