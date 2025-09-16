@@ -37,9 +37,18 @@ public class ProductService : IProductService
                     $"Unable to add a product to Category with id {request.CategoryId} because that category is not found");
             }
 
-            var category = request.MapFromCreateProductRequestToProduct();
-            await _productRepository.AddAsync(category);
-            return Result<ProductResponse>.Ok(category.MapProductToProductResponse());
+            var product = request.MapFromCreateProductRequestToProduct();
+            await _productRepository.AddAsync(product);
+            var productToReturn = await _productRepository.GetByIdAsync(product.Id);
+            
+            if (productToReturn is null)
+            {
+                _logger.LogError("Unable to verify that product was added to the database.");
+                return Result<ProductResponse>.Fail(
+                    $"Unable to verify that product was added to the database");
+            }
+            
+            return Result<ProductResponse>.Ok(productToReturn.MapProductToProductResponse());
         }
         catch (DbException ex)
         {
@@ -98,8 +107,8 @@ public class ProductService : IProductService
 
             if (productToDelete is null)
             {
-                _logger.LogError("Product with id {id} not found", id);
-                return Result<ProductResponse>.Fail($"Product with id {id} not found");
+                _logger.LogError("Product with Id {id} not found", id);
+                return Result<ProductResponse>.Fail($"Product with Id {id} not found");
             }
 
             productToDelete.IsDeleted = true;
