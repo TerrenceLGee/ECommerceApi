@@ -1,6 +1,7 @@
 using ECommerce.Api.Dtos.Products.Request;
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Interfaces.Repositories;
+using ECommerce.Api.Interfaces.Services;
 using ECommerce.Api.Models;
 using ECommerce.Api.Models.Enums;
 using ECommerce.Api.Services;
@@ -15,7 +16,7 @@ public class ProductServiceTests
 {
     private readonly Mock<IProductRepository> _mockProductRepository;
     private readonly Mock<ICategoryRepository> _mockCategoryRepository;
-    private readonly ProductService _productService;
+    private readonly IProductService _productService;
 
     public ProductServiceTests()
     {
@@ -327,7 +328,8 @@ public class ProductServiceTests
             StockKeepingUnit = "111-111",
             IsActive = true,
             Discount = DiscountStatus.None,
-            StockQuantity = 100
+            StockQuantity = 100,
+            Category = new Category {Id = 1, Name = "Category 1", Description = "A category"}
         };
         
         var product2 = new Product
@@ -339,7 +341,8 @@ public class ProductServiceTests
             StockKeepingUnit = "222-222",
             IsActive = true,
             Discount = DiscountStatus.None,
-            StockQuantity = 200
+            StockQuantity = 200,
+            Category = new Category {Id = 1, Name = "Category 1", Description = "A category"}
         };
 
         var productsToBeReturnedFromRepo = new List<Product>
@@ -370,6 +373,24 @@ public class ProductServiceTests
 
         _mockProductRepository
             .Verify(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetCountOfProductsAsync_WhenCalled_ShouldReturnSuccessAndCallRepository()
+    {
+        // Arrange
+        int count = 3;
+
+        _mockProductRepository
+            .Setup(repo => repo.GetCountOfProductsAsync())
+            .ReturnsAsync(count);
+        
+        // Act
+        var result = await _productService.GetCountOfProductsAsync();
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(3);
     }
    
 }
