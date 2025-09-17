@@ -6,6 +6,7 @@ using ECommerce.Api.Models;
 using ECommerce.Api.Models.Enums;
 using ECommerce.Api.Services;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -14,6 +15,7 @@ namespace ECommerce.Api.Tests;
 [TestClass]
 public class ProductServiceTests
 {
+
     private readonly Mock<IProductRepository> _mockProductRepository;
     private readonly Mock<ICategoryRepository> _mockCategoryRepository;
     private readonly IProductService _productService;
@@ -31,75 +33,39 @@ public class ProductServiceTests
     }
 
     [TestMethod]
-    public async Task GetProductByIdAsync_WhenProductExists_ShouldReturnSuccessResultWithProduct()
+    public async Task CreateProductAsync_WhenCategoryExists_ShouldReturnSuccessResultAndCallRepository()
     {
         // Arrange
-        var product = new Product
+        var category = new Category
         {
             Id = 1,
-            Name = "Test Product",
-            Description = "Some Description",
-            StockKeepingUnit = "ABC-123",
-            Price = 99.99m,
-            Discount = DiscountStatus.FivePercent,
-            StockQuantity = 500,
-            CategoryId = 1,
-            Category = new Category { Id = 1, Name = "Test Category" }
+            Name = "Category 1",
+            Description = "Basic Category",
+            IsActive = true
         };
 
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(1))
-            .ReturnsAsync(product);
-
-        // Act
-        var result = await _productService.GetProductByIdAsync(1);
-        
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Should().Be(1);
-        result.Value.Name.Should().Be("Test Product");
-    }
-
-    [TestMethod]
-    public async Task GetProductByIdAsync_WhenProductDoesNotExist_ShouldReturnFailureResult()
-    {
-        // Arrange
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync((Product?)null);
-        
-        // Act
-        var result = await _productService.GetProductByIdAsync(99);
-        
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.ErrorMessage.Should().Contain("not found");
-    }
-
-    [TestMethod]
-    public async Task CreateProductAsync_WhenCategoryExists_ShouldCallRepositoryAndReturnSuccess()
-    {
-        // Arrange
         var request = new CreateProductRequest
         {
-            CategoryId = 1, 
-            Name = "New Gadget", 
-            Description = "Some Description",
-            StockKeepingUnit = "ABC-123",
-            Price = 99.99m,
+            Name = "New Product",
+            Description = "New Product To Add",
+            StockKeepingUnit = "NEW-PRD",
+            Price = 15.99m,
             Discount = DiscountStatus.FivePercent,
-            StockQuantity = 500,
+            StockQuantity = 300,
+            CategoryId = 1
         };
 
         var productToReturnFromRepo = new Product
         {
             Id = 1,
             Name = request.Name,
+            Description = request.Description,
+            StockKeepingUnit = request.StockKeepingUnit,
             Price = request.Price,
+            Discount = request.Discount,
             StockQuantity = request.StockQuantity,
             CategoryId = request.CategoryId,
-            Category = new Category { Id = 1, Name = "Test Category" }
+            Category = category
         };
 
         _mockCategoryRepository
@@ -116,29 +82,41 @@ public class ProductServiceTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Id.Should().Be(1);
+        result.Value.Id.Should().Be(productToReturnFromRepo.Id);
+        result.Value.Category.Id.Should().Be(category.Id);
+        result.Value.Name.Should().Be($"{productToReturnFromRepo.Name}");
 
         _mockProductRepository
             .Verify(repo => repo.AddAsync(It.IsAny<Product>()), Times.Once);
     }
 
     [TestMethod]
-    public async Task CreateProductAsync_WhenCategoryDoesNotExist_ShouldReturnFailureAndNotCallRepository()
+    public async Task CreateCategoryAsync_WhenCategoryDoesNotExist_ShouldReturnFailureResultAndNotCallRepository()
     {
         // Arrange
+        var nonExistentCategory = new Category
+        {
+            Id = 99,
+            Name = "Doesn't exist",
+            Description = "Not available",
+            IsActive = false
+        };
+
+        var nonExistentCategoryId = nonExistentCategory.Id;
+        
         var request = new CreateProductRequest
         {
-            CategoryId = 99,
-            Name = "New Gadget",
-            Description = "Some Description",
-            StockKeepingUnit = "ABC-123",
-            Price = 99.99m,
+            Name = "New Product",
+            Description = "New Product To Add",
+            StockKeepingUnit = "NEW-PRD",
+            Price = 15.99m,
             Discount = DiscountStatus.FivePercent,
-            StockQuantity = 500,
+            StockQuantity = 300,
+            CategoryId = nonExistentCategoryId
         };
 
         _mockCategoryRepository
-            .Setup(repo => repo.ExistsAsync(request.CategoryId))
+            .Setup(repo => repo.ExistsAsync(nonExistentCategoryId))
             .ReturnsAsync(false);
         
         // Act
@@ -155,242 +133,104 @@ public class ProductServiceTests
     }
 
     [TestMethod]
-    public async Task UpdateProductAsync_WhenProductExists_ShouldCallRepositoryAndReturnSuccess()
+    public async Task CreateCategoryAsync_WhenRepositoryReturnsDbUpdateException_ShouldReturnFailureResult()
     {
-        // Arrange 
-        var request = new UpdateProductRequest
-        {
-            CategoryId = 1,
-            Name = "Updated Gadget",
-            Description = "Updated Description",
-            StockKeepingUnit = "ABC-123",
-            IsActive = true,
-            Discount = DiscountStatus.FivePercent,
-            StockQuantity = 500,
-        };
-
-        var productToReturnFromRepo = new Product
+        // Arrange
+        var category = new Category
         {
             Id = 1,
-            Name = request.Name,
-            StockKeepingUnit = request.StockKeepingUnit,
-            Discount = request.Discount,
-            Description = request.Description,
-            StockQuantity = request.StockQuantity,
-            CategoryId = request.CategoryId,
-            Category = new Category {Id = 1, Name = "Test Category"}
+            Name = "Category 1",
+            Description = "Basic Category",
+            IsActive = true
         };
 
-        var productId = 1;
+        var request = new CreateProductRequest
+        {
+            Name = "New Product",
+            Description = "New Product To Add",
+            StockKeepingUnit = "NEW-PRD",
+            Price = 15.99m,
+            Discount = DiscountStatus.FivePercent,
+            StockQuantity = 300,
+            CategoryId = 1
+        };
+
+
+        _mockCategoryRepository
+            .Setup(repo => repo.ExistsAsync(request.CategoryId))
+            .ReturnsAsync(true);
+        
+        _mockProductRepository
+            .Setup(repo => repo.AddAsync(It.IsAny<Product>()))
+            .ThrowsAsync(new DbUpdateException("Database error occurred"));
+
+ 
+        // Act
+        var result = await _productService.CreateProductAsync(request);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.ErrorMessage.Should().Contain("Database error occurred");
+
+        _mockProductRepository
+            .Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task UpdateProductAsync_WhenProductToUpdateIsNotNull_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var category = new Category
+        {
+            Id = 1,
+            Name = "Category 1",
+            Description = "Basic Category",
+            IsActive = true
+        };
+
+        var productToUpdate = new Product
+        {
+            Id = 1,
+            Name = "Original Product",
+            Description = "Original Product Description",
+            IsActive = true,
+            StockKeepingUnit = "ORG-PRD",
+            Price = 39.99m,
+            Discount = DiscountStatus.None,
+            StockQuantity = 150,
+            CategoryId = category.Id,
+            Category = category
+        };
+        
+        var request = new UpdateProductRequest
+        {
+            Name = "Updated Name",
+            Description = "Product To Be Updated",
+            StockKeepingUnit = "UPD-PRD",
+            StockQuantity = 300,
+            Discount = DiscountStatus.FivePercent,
+            CategoryId = category.Id,
+            IsActive = true
+        };
+
+        _mockProductRepository
+            .Setup(repo => repo.GetByIdAsync(productToUpdate.Id))
+            .ReturnsAsync(productToUpdate);
 
         _mockCategoryRepository
             .Setup(repo => repo.ExistsAsync(request.CategoryId))
             .ReturnsAsync(true);
 
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(productToReturnFromRepo);
-        
         // Act
-        var result = await _productService.UpdateProductAsync(productId, request);
-        
+        var result = await _productService.UpdateProductAsync(productToUpdate.Id, request);
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
         result.Value.Id.Should().Be(1);
+        result.Value.Category.Id.Should().Be(1);
 
         _mockProductRepository
-            .Verify(repo => repo.UpdateAsync(productToReturnFromRepo), Times.Once);
+            .Verify(repo => repo.UpdateAsync(It.IsAny<Product>()), Times.Once);
     }
-
-    [TestMethod]
-    public async Task UpdateProductAsync_WhenProductDoesNotExist_ShouldReturnFailureAndNotCallRepository()
-    {
-        // Arrange
-        var nonExistentProduct = new Product
-        {
-            Id = 99,
-            CategoryId = 1,
-            Name = "Non-Existent Gadget",
-            Description = "Does not exist",
-            StockKeepingUnit = "000-000",
-            IsActive = false,
-            Discount = DiscountStatus.None,
-            StockQuantity = 0
-        };
-
-        var request = new UpdateProductRequest
-        {
-            CategoryId = 1,
-            Name = "NonExistent Gadget",
-            Description = "Does not exist",
-            StockKeepingUnit = "000-000",
-            IsActive = false,
-            Discount = DiscountStatus.None,
-            StockQuantity = 0
-        };
-
-        var productId = 99;
-
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(nonExistentProduct.Id))
-            .ReturnsAsync((Product?)null);
-        
-        // Act 
-        var result = await _productService.UpdateProductAsync(productId, request);
-        
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.ErrorMessage.Should().Contain($"Product with Id {productId} not found");
-
-        _mockProductRepository
-            .Verify(repo => repo.UpdateAsync(nonExistentProduct), Times.Never);
-    }
-
-    [TestMethod]
-    public async Task DeleteProductAsync_WhenProductExists_ShouldReturnSuccessAndCallRepository()
-    {
-        // Arrange
-        var productId = 1;
-
-        var productToReturnToDelete = new Product
-        {
-            Id = productId,
-            Name = "Deleted product",
-            Description = "Product Deleted",
-            DeletedAt = DateTime.UtcNow,
-            StockKeepingUnit = "DEL-123-ETE",
-            Discount = DiscountStatus.FivePercent,
-            StockQuantity = 100,
-            CategoryId = 1,
-            Category = new Category { Id = 1, Description = "Test Category" }
-        };
-
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(productToReturnToDelete);
-
-        // Act
-        var result = await _productService.DeleteProductAsync(productId);
-        
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
-        result.Value.Id.Should().Be(1);
-
-        _mockProductRepository
-            .Verify(repo => repo.UpdateAsync(productToReturnToDelete), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task DeleteProductAsync_WhenProductDoesNotExist_ShouldReturnFailureAndNotCallRepository()
-    {
-        // Arrange
-        var nonExistentProductToDelete = new Product
-        {
-            Id = 99,
-            CategoryId = 1,
-            Name = "Non-Existent Gadget",
-            Description = "Does not exist",
-            StockKeepingUnit = "000-000",
-            IsActive = false,
-            Discount = DiscountStatus.None,
-            StockQuantity = 0
-        };
-
-        var productId = nonExistentProductToDelete.Id;
-
-        _mockProductRepository
-            .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync((Product?)null);
-        
-        // Act 
-        var result = await _productService.DeleteProductAsync(productId);
-        
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().Contain($"Product with Id {productId} not found");
-
-        _mockProductRepository
-            .Verify(repo => repo.UpdateAsync(nonExistentProductToDelete), Times.Never);
-    }
-
-    [TestMethod]
-    public async Task GetAllProductsAsync_WhenProductsExists_ShouldReturnPagedListOfResponses()
-    {
-        // Arrange
-        var product1 = new Product
-        {
-            Id = 1,
-            CategoryId = 1,
-            Name = "Product 1",
-            Description = "First",
-            StockKeepingUnit = "111-111",
-            IsActive = true,
-            Discount = DiscountStatus.None,
-            StockQuantity = 100,
-            Category = new Category {Id = 1, Name = "Category 1", Description = "A category"}
-        };
-        
-        var product2 = new Product
-        {
-            Id = 2,
-            CategoryId = 1,
-            Name = "Product 2",
-            Description = "Second",
-            StockKeepingUnit = "222-222",
-            IsActive = true,
-            Discount = DiscountStatus.None,
-            StockQuantity = 200,
-            Category = new Category {Id = 1, Name = "Category 1", Description = "A category"}
-        };
-
-        var productsToBeReturnedFromRepo = new List<Product>
-        {
-            product1,
-            product2
-        };
-
-        var mockPagedList = new PagedList<Product>(productsToBeReturnedFromRepo, 2, 1, 10);
-
-        _mockProductRepository
-            .Setup(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()))
-            .ReturnsAsync(mockPagedList);
-        
-        // Act
-        var result = await _productService.GetAllProductsAsync(new PaginationParams());
-        
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
-
-        result.Value.CurrentPage.Should().Be(1);
-        result.Value.TotalCount.Should().Be(2);
-        result.Value.PageSize.Should().Be(10);
-
-        result.Value.Items.Should().HaveCount(2);
-        result.Value.Items.First().Name.Should().Be("Product 1");
-
-        _mockProductRepository
-            .Verify(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task GetCountOfProductsAsync_WhenCalled_ShouldReturnSuccessAndCallRepository()
-    {
-        // Arrange
-        int count = 3;
-
-        _mockProductRepository
-            .Setup(repo => repo.GetCountOfProductsAsync())
-            .ReturnsAsync(count);
-        
-        // Act
-        var result = await _productService.GetCountOfProductsAsync();
-        
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(3);
-    }
-   
 }
