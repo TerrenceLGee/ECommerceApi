@@ -80,7 +80,7 @@ public class ProductService : IProductService
                     "Unable to update the Product's Category to category with Id {id} because that category is not found.",
                     request.CategoryId);
                 return Result<ProductResponse>.Fail(
-                    $"Unable to update the Product's Category to category with Id {id} because category is not found");
+                    $"Unable to update the Product's Category to category with Id {request.CategoryId} because category is not found");
             }
             
             request.UpdateProductFromUpdateProductRequest(productToUpdate);
