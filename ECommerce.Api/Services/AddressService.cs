@@ -98,6 +98,32 @@ public class AddressService : IAddressService
             return Result<AddressResponse>.Fail($"An unexpected error occurred: {ex.Message}");
         }
     }
+    
+    public async Task<Result<AddressResponse>> GetAddressByIdAsync(string customerId, int addressId)
+    {
+        try
+        {
+            var address = await _addressRepository.GetAddressByIdAsync(customerId, addressId);
+
+            if (address is null)
+            {
+                _logger.LogError("Address with Id {id} not found.", addressId);
+                return Result<AddressResponse>.Fail($"Address with Id {addressId} not found");
+            }
+
+            return Result<AddressResponse>.Ok(address.MapAddressToAddressResponse());
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogCritical("There was an error retrieving the address: {errorMessage}", ex.Message);
+            return Result<AddressResponse>.Fail($"There was an error retrieving the address: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical("An unexpected error occurred: {errorMessage}", ex.Message);
+            return Result<AddressResponse>.Fail($"An unexpected error occurred: {ex.Message}");
+        }
+    }
 
     public async Task<Result<PagedList<AddressResponse>>> GetAllAddressesAsync(string customerId, PaginationParams paginationParams)
     {
@@ -129,31 +155,7 @@ public class AddressService : IAddressService
         }
     }
 
-    public async Task<Result<AddressResponse>> GetAddressByIdAsync(string customerId, int addressId)
-    {
-        try
-        {
-            var address = await _addressRepository.GetAddressByIdAsync(customerId, addressId);
-
-            if (address is null)
-            {
-                _logger.LogError("Address with Id {id} not found.", addressId);
-                return Result<AddressResponse>.Fail($"Address with Id {addressId} not found");
-            }
-
-            return Result<AddressResponse>.Ok(address.MapAddressToAddressResponse());
-        }
-        catch (ArgumentNullException ex)
-        {
-            _logger.LogCritical("There was an error retrieving the address: {errorMessage}", ex.Message);
-            return Result<AddressResponse>.Fail($"There was an error retrieving the address: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical("An unexpected error occurred: {errorMessage}", ex.Message);
-            return Result<AddressResponse>.Fail($"An unexpected error occurred: {ex.Message}");
-        }
-    }
+    
 
     public async Task<Result<int>> GetCountOfAddressesAsync(string customerId)
     {
