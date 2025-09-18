@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Repositories;
 
-public class SaleRepository : ISaleRepository
+public class SalesRepository : ISalesRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public SaleRepository(
+    public SalesRepository(
         ApplicationDbContext context)
     {
         _context = context;

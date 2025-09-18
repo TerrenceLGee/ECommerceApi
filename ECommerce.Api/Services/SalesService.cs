@@ -12,18 +12,18 @@ using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Api.Services;
 
-public class SaleService : ISalesService
+public class SalesService : ISalesService
 {
-    private readonly ISaleRepository _saleRepository;
+    private readonly ISalesRepository _salesRepository;
     private readonly IProductRepository _productRepository;
-    private readonly ILogger<SaleService> _logger;
+    private readonly ILogger<SalesService> _logger;
     
-    public SaleService(
-        ISaleRepository saleRepository,
+    public SalesService(
+        ISalesRepository salesRepository,
         IProductRepository productRepository,
-        ILogger<SaleService> logger)
+        ILogger<SalesService> logger)
     {
-        _saleRepository = saleRepository;
+        _salesRepository = salesRepository;
         _productRepository = productRepository;
         _logger = logger;
     }
@@ -71,7 +71,8 @@ public class SaleService : ISalesService
                     ProductId = product.Id,
                     Quantity = item.Quantity,
                     UnitPrice = product.Price,
-                    DiscountPrice = product.Price - ((((int)product.Discount) / 100.0m) * product.Price)
+                    DiscountPrice = product.Price - ((((int)product.Discount) / 100.0m) * product.Price),
+                    Product = product
                 };
 
                 newSale.SaleItems.Add(saleProduct);
@@ -82,7 +83,7 @@ public class SaleService : ISalesService
 
             newSale.TotalPrice = totalPrice;
 
-            await _saleRepository.AddAsync(newSale);
+            await _salesRepository.AddAsync(newSale);
 
             var response = newSale.MapFromSaleToSaleResponse();
 
@@ -105,7 +106,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var saleToUpdate = await _saleRepository.GetByIdAsync(saleId);
+            var saleToUpdate = await _salesRepository.GetByIdAsync(saleId);
 
             if (saleToUpdate is null)
             {
@@ -115,7 +116,7 @@ public class SaleService : ISalesService
 
             saleToUpdate.Status = updatedStatus;
             saleToUpdate.UpdatedAt = DateTime.UtcNow;
-            await _saleRepository.UpdateAsync(saleToUpdate);
+            await _salesRepository.UpdateAsync(saleToUpdate);
 
             return Result<string>.Ok(
                 $"The status of Sale #{saleId} has now been changed to: {saleToUpdate.Status.GetDisplayName()}");
@@ -136,7 +137,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var saleToCancel = await _saleRepository.GetByIdAsync(saleId);
+            var saleToCancel = await _salesRepository.GetByIdAsync(saleId);
 
             if (saleToCancel is null)
             {
@@ -151,7 +152,7 @@ public class SaleService : ISalesService
             }
 
             saleToCancel.Status = SaleStatus.Canceled;
-            await _saleRepository.UpdateAsync(saleToCancel);
+            await _salesRepository.UpdateAsync(saleToCancel);
             return Result<string>.Ok($"Sale has been canceled, Status is now: {saleToCancel.Status}");
         }
         catch (ArgumentNullException ex)
@@ -170,7 +171,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var saleToRefund = await _saleRepository.GetByIdAsync(saleId);
+            var saleToRefund = await _salesRepository.GetByIdAsync(saleId);
 
             if (saleToRefund is null)
             {
@@ -185,7 +186,7 @@ public class SaleService : ISalesService
             }
 
             saleToRefund.Status = SaleStatus.Refunded;
-            await _saleRepository.UpdateAsync(saleToRefund);
+            await _salesRepository.UpdateAsync(saleToRefund);
             return Result<string>.Ok($"Sale has been refunded. Status is now {saleToRefund.Status}");
         }
         catch (ArgumentNullException ex)
@@ -204,7 +205,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var userSaleToCancel = await _saleRepository.GetUserSaleByIdAsync(userId, saleId);
+            var userSaleToCancel = await _salesRepository.GetUserSaleByIdAsync(userId, saleId);
 
             if (userSaleToCancel is null)
             {
@@ -219,7 +220,7 @@ public class SaleService : ISalesService
             }
 
             userSaleToCancel.Status = SaleStatus.Canceled;
-            await _saleRepository.UpdateAsync(userSaleToCancel);
+            await _salesRepository.UpdateAsync(userSaleToCancel);
             return Result<string>.Ok($"Sale has been canceled, Status is now: {userSaleToCancel.Status}");
         }
         catch (ArgumentNullException ex)
@@ -238,7 +239,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var sales = await _saleRepository.GetAllAsync(paginationParams);
+            var sales = await _salesRepository.GetAllAsync(paginationParams);
             var saleResponseDtos = sales.Items
                 .Select(s => s.MapFromSaleToSaleResponse())
                 .ToList();
@@ -267,7 +268,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var sale = await _saleRepository.GetByIdAsync(id);
+            var sale = await _salesRepository.GetByIdAsync(id);
 
             if (sale is null)
             {
@@ -293,7 +294,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var sales = await _saleRepository.GetByUserIdAsync(userId, paginationParams);
+            var sales = await _salesRepository.GetByUserIdAsync(userId, paginationParams);
 
             var userSaleResponseDtos = sales.Items
                 .Select(s => s.MapFromSaleToSaleResponse())
@@ -323,7 +324,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var sale = await _saleRepository.GetUserSaleByIdAsync(userId, saleId);
+            var sale = await _salesRepository.GetUserSaleByIdAsync(userId, saleId);
 
             if (sale is null)
             {
@@ -349,7 +350,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var count = await _saleRepository.GetCountOfSalesAsync();
+            var count = await _salesRepository.GetCountOfSalesAsync();
 
             return Result<int>.Ok(count);
         }
@@ -365,7 +366,7 @@ public class SaleService : ISalesService
     {
         try
         {
-            var count = await _saleRepository.GetCountOfUserSalesAsync(userId);
+            var count = await _salesRepository.GetCountOfUserSalesAsync(userId);
 
             return Result<int>.Ok(count);
         }
