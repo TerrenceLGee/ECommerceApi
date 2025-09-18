@@ -132,7 +132,7 @@ public class AddressServiceTests
         result.Value.Id.Should().Be(addressId);
 
         _mockAddressRepository
-            .Verify(repo => repo.UpdateAddressAsync(It.IsAny<Address>()), Times.Once);
+            .Verify(repo => repo.UpdateAddressAsync(addressToReturn), Times.Once);
     }
 
     [TestMethod]

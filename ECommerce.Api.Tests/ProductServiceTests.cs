@@ -223,7 +223,7 @@ public class ProductServiceTests
         result.Value.Category.Id.Should().Be(1);
 
         _mockProductRepository
-            .Verify(repo => repo.UpdateAsync(It.IsAny<Product>()), Times.Once);
+            .Verify(repo => repo.UpdateAsync(productToUpdate), Times.Once);
     }
 
     [TestMethod]
