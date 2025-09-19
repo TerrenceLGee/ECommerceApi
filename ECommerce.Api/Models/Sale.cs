@@ -12,7 +12,6 @@ public class Sale
     public SaleStatus Status { get; set; } = SaleStatus.Pending;
     public string? Notes { get; set; }
     public bool IsDeleted { get; set; } = false;
-    
     public string StreetNumber { get; set; } = string.Empty;
     public string StreetName { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;

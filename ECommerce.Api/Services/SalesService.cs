@@ -111,7 +111,7 @@ public class SalesService : ISalesService
             if (saleToUpdate is null)
             {
                 _logger.LogError("Sale with Id {id} not found.", saleId);
-                return Result<string>.Fail($"Sale with id {saleId} not found");
+                return Result<string>.Fail($"Sale with Id {saleId} not found");
             }
 
             saleToUpdate.Status = updatedStatus;
