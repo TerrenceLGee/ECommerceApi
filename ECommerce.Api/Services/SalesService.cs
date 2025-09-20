@@ -151,6 +151,11 @@ public class SalesService : ISalesService
                 return Result<string>.Fail($"Unable to cancel a Sale with status: {saleToCancel.Status}");
             }
 
+            foreach (var item in saleToCancel.SaleItems)
+            {
+                item.Product.StockQuantity += item.Quantity;
+            }
+
             saleToCancel.Status = SaleStatus.Canceled;
             await _salesRepository.UpdateAsync(saleToCancel);
             return Result<string>.Ok($"Sale has been canceled, Status is now: {saleToCancel.Status}");
@@ -219,6 +224,11 @@ public class SalesService : ISalesService
                 return Result<string>.Fail($"Unable to cancel a sale with status: {userSaleToCancel.Status}");
             }
 
+            foreach (var item in userSaleToCancel.SaleItems)
+            {
+                item.Product.StockQuantity += item.Quantity;
+            }
+
             userSaleToCancel.Status = SaleStatus.Canceled;
             await _salesRepository.UpdateAsync(userSaleToCancel);
             return Result<string>.Ok($"Sale has been canceled, Status is now: {userSaleToCancel.Status}");
@@ -273,7 +283,7 @@ public class SalesService : ISalesService
             if (sale is null)
             {
                 _logger.LogError("Sale with Id {id} not found", id);
-                return Result<SaleResponse>.Fail($"Sale with Id {id} found found");
+                return Result<SaleResponse>.Fail($"Sale with Id {id} not found");
             }
 
             return Result<SaleResponse>.Ok(sale.MapFromSaleToSaleResponse());

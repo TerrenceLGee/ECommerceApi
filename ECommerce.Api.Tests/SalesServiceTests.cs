@@ -1,10 +1,7 @@
-using ECommerce.Api.Dtos.Products.Request;
 using ECommerce.Api.Dtos.Sales.Request;
-using ECommerce.Api.Dtos.Address;
 using ECommerce.Api.Dtos.Shared.Pagination;
 using ECommerce.Api.Interfaces.Repositories;
 using ECommerce.Api.Interfaces.Services;
-using ECommerce.Api.Mappings;
 using ECommerce.Api.Models;
 using ECommerce.Api.Models.Enums;
 using ECommerce.Api.Services;
@@ -53,9 +50,9 @@ public class SalesServiceTests
                 Discount = DiscountStatus.FivePercent,
                 StockQuantity = 300,
                 CategoryId = 1,
-                Category = new Category {Id = 1, Name = "Category 1", Description = "First"}
+                Category = new Category { Id = 1, Name = "Category 1", Description = "First" }
             },
-            new ()
+            new()
             {
                 Id = 2,
                 Name = "Product 2",
@@ -65,9 +62,9 @@ public class SalesServiceTests
                 Discount = DiscountStatus.FifteenPercent,
                 StockQuantity = 600,
                 CategoryId = 2,
-                Category = new Category {Id = 2, Name = "Category 2", Description = "Second"}
+                Category = new Category { Id = 2, Name = "Category 2", Description = "Second" }
             },
-            new ()
+            new()
             {
                 Id = 3,
                 Name = "Product 3",
@@ -77,7 +74,7 @@ public class SalesServiceTests
                 Discount = DiscountStatus.None,
                 StockQuantity = 150,
                 CategoryId = 3,
-                Category = new Category {Id = 3, Name = "Category 3", Description = "Third"}
+                Category = new Category { Id = 3, Name = "Category 3", Description = "Third" }
             }
         };
 
@@ -96,7 +93,7 @@ public class SalesServiceTests
             new()
             {
                 ProductId = 3,
-                Quantity  = 30
+                Quantity = 30
             }
         };
 
@@ -132,10 +129,10 @@ public class SalesServiceTests
                     item.SaleId = sale.Id;
                 }
             });
-        
+
         // Act
         var result = await _salesService.CreateSaleAsync(request, customerId);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -194,10 +191,10 @@ public class SalesServiceTests
         _mockProductRepository
             .Setup(repo => repo.GetByIdsAsync(It.IsAny<IEnumerable<int>>()))
             .ReturnsAsync(productsFromRepo);
-        
+
         // Act
         var result = await _salesService.CreateSaleAsync(request, customerId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -292,10 +289,10 @@ public class SalesServiceTests
         _mockProductRepository
             .Setup(repo => repo.GetByIdsAsync(productIds))
             .ReturnsAsync(productsToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.CreateSaleAsync(request, customerId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -394,10 +391,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.AddAsync(It.IsAny<Sale>()))
             .ThrowsAsync(new DbUpdateException("Database error occurred"));
-        
+
         // Act
         var result = await _salesService.CreateSaleAsync(request, customerId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -431,10 +428,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.UpdateSaleStatusAsync(saleToReturnFromRepo.Id, updatedStatus);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -456,10 +453,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync((Sale?)null);
-        
+
         // Act 
         var result = await _salesService.UpdateSaleStatusAsync(saleId, updatedStatus);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -500,10 +497,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
             .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
-        
+
         // Act
         var result = await _salesService.UpdateSaleStatusAsync(saleToReturnFromRepo.Id, updatedStatus);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -533,14 +530,14 @@ public class SalesServiceTests
         };
 
         var canceledStatus = SaleStatus.Canceled;
-        
+
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.CancelSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -559,10 +556,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(saleId))
             .ReturnsAsync((Sale?)null);
-        
+
         // Act
         var result = await _salesService.CancelSaleAsync(saleId);
-        
+
         // Assert 
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -597,10 +594,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.CancelSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -635,20 +632,20 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         _mockSalesRepository
             .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
             .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
-        
+
         // Act
         var result = await _salesService.CancelSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
         result.ErrorMessage.Should().Contain("There was an error canceling the Sale");
     }
-    
+
     [TestMethod]
     public async Task RefundSaleAsync_WhenSaleToRefundIsNotNull_ShouldReturnSuccessResult()
     {
@@ -670,16 +667,16 @@ public class SalesServiceTests
             ZipCode = "654321",
             SaleItems = new List<SaleProduct>()
         };
-        
+
         var refundStatus = SaleStatus.Refunded;
-        
+
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.RefundSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -688,7 +685,7 @@ public class SalesServiceTests
         _mockSalesRepository
             .Verify(repo => repo.UpdateAsync(It.Is<Sale>(s => s.Status == refundStatus)), Times.Once);
     }
-    
+
     [TestMethod]
     public async Task RefundSaleAsync_WhenSaleToRefundIsNull_ShouldReturnFailureResult()
     {
@@ -698,10 +695,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync((Sale?)null);
-        
+
         // Act 
         var result = await _salesService.RefundSaleAsync(saleId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -710,7 +707,7 @@ public class SalesServiceTests
         _mockSalesRepository
             .Verify(repo => repo.UpdateAsync(It.IsAny<Sale>()), Times.Never);
     }
-    
+
     [TestMethod]
     public async Task RefundProductAsync_WhenSaleStatusIsNotCompleted_ShouldReturnFailureMessage()
     {
@@ -732,23 +729,23 @@ public class SalesServiceTests
             ZipCode = "654321",
             SaleItems = new List<SaleProduct>()
         };
-        
+
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.RefundSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
         result.ErrorMessage.Should().Contain($"Unable to refund a Sale with status: {saleToReturnFromRepo.Status}");
-        
+
         _mockSalesRepository
             .Verify(repo => repo.UpdateAsync(It.IsAny<Sale>()), Times.Never);
     }
-    
+
     [TestMethod]
     public async Task RefundSaleAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
     {
@@ -778,10 +775,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
             .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
-        
+
         // Act
         var result = await _salesService.RefundSaleAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -817,10 +814,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -840,10 +837,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleId))
             .ReturnsAsync((Sale?)null);
-        
+
         // Act 
         var result = await _salesService.UserCancelSaleAsync(customerId, saleId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -858,7 +855,7 @@ public class SalesServiceTests
     {
         // Arrange
         var customerId = "customerId123";
-        
+
         var saleToReturnFromRepo = new Sale
         {
             Id = 1,
@@ -880,10 +877,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetUserSaleByIdAsync(customerId, It.IsAny<int>()))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act 
         var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -924,10 +921,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
             .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
-        
+
         // Act
         var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -939,7 +936,7 @@ public class SalesServiceTests
     {
         // Arrange
         var customerId = "customerId123";
-        
+
         var salesToReturnFromRepo = new List<Sale>()
         {
             new()
@@ -959,7 +956,7 @@ public class SalesServiceTests
                 ZipCode = "654321",
                 SaleItems = new List<SaleProduct>()
             },
-            new ()
+            new()
             {
                 Id = 2,
                 CreatedAt = DateTime.UtcNow,
@@ -983,10 +980,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()))
             .ReturnsAsync(mockPagedList);
-        
+
         // Act
         var result = await _salesService.GetAllSalesAsync(new PaginationParams());
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -1005,10 +1002,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()))
             .ThrowsAsync(new ArgumentNullException(nameof(PaginationParams)));
-        
+
         // Act
         var result = await _salesService.GetAllSalesAsync(new PaginationParams());
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -1042,10 +1039,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(saleToReturnFromRepo.Id))
             .ReturnsAsync(saleToReturnFromRepo);
-        
+
         // Act
         var result = await _salesService.GetSaleByIdAsync(saleToReturnFromRepo.Id);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -1064,10 +1061,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(saleId))
             .ReturnsAsync((Sale?)null);
-        
+
         // Act
         var result = await _salesService.GetSaleByIdAsync(saleId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -1079,14 +1076,14 @@ public class SalesServiceTests
     {
         // Arrange
         var saleId = 1;
-       
+
         _mockSalesRepository
             .Setup(repo => repo.GetByIdAsync(saleId))
             .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
-        
+
         // Act
         var result = await _salesService.GetSaleByIdAsync(saleId);
-        
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Value.Should().BeNull();
@@ -1142,10 +1139,10 @@ public class SalesServiceTests
         _mockSalesRepository
             .Setup(repo => repo.GetByUserIdAsync(customerId, It.IsAny<PaginationParams>()))
             .ReturnsAsync(mockPagedList);
-        
+
         // Act
         var result = await _salesService.GetUserSalesAsync(customerId, new PaginationParams());
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
@@ -1156,5 +1153,147 @@ public class SalesServiceTests
         result.Value.Items.Count.Should().Be(2);
         result.Value.Items.First().CustomerId.Should().Be(customerId);
 
+    }
+
+    [TestMethod]
+    public async Task GetUserSalesAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetByUserIdAsync(customerId, It.IsAny<PaginationParams>()))
+            .ThrowsAsync(new ArgumentNullException(nameof(PaginationParams)));
+
+        // Act
+        var result = await _salesService.GetUserSalesAsync(customerId, new PaginationParams());
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error retrieving sales");
+    }
+
+    [TestMethod]
+    public async Task GetUserSaleByIdAsync_WhenSaleToReturnIsNotNull_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = customerId,
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Processing,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York City",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id))
+            .ReturnsAsync(saleToReturnFromRepo);
+
+        // Act
+        var result = await _salesService.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id);
+
+        // Assert 
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Id.Should().Be(saleToReturnFromRepo.Id);
+
+        _mockSalesRepository
+            .Verify(repo => repo.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id));
+    }
+
+    [TestMethod]
+    public async Task GetUserSaleByIdAsync_WhenSaleToReturnIsNull_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        var saleId = 1;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleId))
+            .ReturnsAsync((Sale?)null);
+
+        // Act
+        var result = await _salesService.GetUserSaleByIdAsync(customerId, saleId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain($"Sale with Id {saleId} not found");
+    }
+
+    [TestMethod]
+    public async Task GetUserSaleByIdAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        var saleId = 1;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleId))
+            .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
+
+        // Act
+        var result = await _salesService.GetUserSaleByIdAsync(customerId, saleId);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error retrieving sale");
+    }
+
+    [TestMethod]
+    public async Task GetCountOfSalesAsync_EnsureRepositoryReturnsANumber()
+    {
+        // Arrange
+        var count = 3;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetCountOfSalesAsync())
+            .ReturnsAsync(count);
+        
+        // Act
+        var result = await _salesService.GetCountOfSalesAsync();
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(3);
+
+        _mockSalesRepository
+            .Verify(repo => repo.GetCountOfSalesAsync(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetCountOfUserSalesAsync_EnsureRepositoryReturnsANumber()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        var count = 3;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetCountOfUserSalesAsync(customerId))
+            .ReturnsAsync(count);
+        
+        // Act
+        var result = await _salesService.GetCountOfUserSalesAsync(customerId);
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(3);
+
+        _mockSalesRepository
+            .Verify(repo => repo.GetCountOfUserSalesAsync(customerId), Times.Once);
     }
 }
