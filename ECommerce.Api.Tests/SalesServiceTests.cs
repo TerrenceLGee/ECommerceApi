@@ -748,4 +748,413 @@ public class SalesServiceTests
         _mockSalesRepository
             .Verify(repo => repo.UpdateAsync(It.IsAny<Sale>()), Times.Never);
     }
+    
+    [TestMethod]
+    public async Task RefundSaleAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = "customerId123",
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Completed,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
+            .ReturnsAsync(saleToReturnFromRepo);
+
+        _mockSalesRepository
+            .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
+            .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
+        
+        // Act
+        var result = await _salesService.RefundSaleAsync(saleToReturnFromRepo.Id);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error refunding the Sale");
+    }
+
+    [TestMethod]
+    public async Task UserCancelSaleAsync_WhenUserSaleIsNotNull_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = customerId,
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Processing,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York City",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        var canceledStatus = SaleStatus.Canceled;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id))
+            .ReturnsAsync(saleToReturnFromRepo);
+        
+        // Act
+        var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Should().Contain($"Sale has been canceled, Status is now: {canceledStatus}");
+
+        _mockSalesRepository
+            .Verify(repo => repo.UpdateAsync(saleToReturnFromRepo), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task UserCancelSaleAsync_WhenUserSaleIsNull_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        var saleId = 1;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleId))
+            .ReturnsAsync((Sale?)null);
+        
+        // Act 
+        var result = await _salesService.UserCancelSaleAsync(customerId, saleId);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Be($"Sale with Id {saleId} not found");
+
+        _mockSalesRepository
+            .Verify(repo => repo.UpdateAsync(It.IsAny<Sale>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task UserCancelSaleAsync_WhenSaleStatusIsWrongForCancellation_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = customerId,
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Refunded,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York City",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, It.IsAny<int>()))
+            .ReturnsAsync(saleToReturnFromRepo);
+        
+        // Act 
+        var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain($"Unable to cancel a sale with status: {saleToReturnFromRepo.Status}");
+
+        _mockSalesRepository
+            .Verify(repo => repo.UpdateAsync(It.IsAny<Sale>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task UserCancelSaleAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = customerId,
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Processing,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York City",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetUserSaleByIdAsync(customerId, saleToReturnFromRepo.Id))
+            .ReturnsAsync(saleToReturnFromRepo);
+
+        _mockSalesRepository
+            .Setup(repo => repo.UpdateAsync(It.IsAny<Sale>()))
+            .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
+        
+        // Act
+        var result = await _salesService.UserCancelSaleAsync(customerId, saleToReturnFromRepo.Id);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error canceling the Sale");
+    }
+
+    [TestMethod]
+    public async Task GetAllSalesAsync_WhenRepositoryDoesNotThrowArgumentNullException_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+        
+        var salesToReturnFromRepo = new List<Sale>()
+        {
+            new()
+            {
+                Id = 1,
+                CreatedAt = DateTime.UtcNow,
+                CustomerId = customerId,
+                TotalPrice = 45.99m,
+                Status = SaleStatus.Completed,
+                Notes = "Needed to buy a few items",
+                IsDeleted = false,
+                StreetNumber = "123456",
+                StreetName = "Main Street",
+                City = "New York City",
+                State = "New York",
+                Country = "USA",
+                ZipCode = "654321",
+                SaleItems = new List<SaleProduct>()
+            },
+            new ()
+            {
+                Id = 2,
+                CreatedAt = DateTime.UtcNow,
+                CustomerId = customerId,
+                TotalPrice = 99.45m,
+                Status = SaleStatus.Processing,
+                Notes = "Needed to buy a few more things that I forgot",
+                IsDeleted = false,
+                StreetNumber = "123456",
+                StreetName = "Main Street",
+                City = "New York City",
+                State = "New York",
+                Country = "USA",
+                ZipCode = "654321",
+                SaleItems = new List<SaleProduct>()
+            }
+        };
+
+        var mockPagedList = new PagedList<Sale>(salesToReturnFromRepo, 2, 1, 10);
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()))
+            .ReturnsAsync(mockPagedList);
+        
+        // Act
+        var result = await _salesService.GetAllSalesAsync(new PaginationParams());
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.CurrentPage.Should().Be(1);
+        result.Value.TotalPages.Should().Be(1);
+        result.Value.PageSize.Should().Be(10);
+        result.Value.TotalCount.Should().Be(2);
+        result.Value.Items.Count.Should().Be(2);
+        result.Value.Items.First().Id.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task GetAllSalesAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange 
+        _mockSalesRepository
+            .Setup(repo => repo.GetAllAsync(It.IsAny<PaginationParams>()))
+            .ThrowsAsync(new ArgumentNullException(nameof(PaginationParams)));
+        
+        // Act
+        var result = await _salesService.GetAllSalesAsync(new PaginationParams());
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error retrieving sales");
+    }
+
+    [TestMethod]
+    public async Task GetSaleByIdAsync_WhenSaleToReturnIsNotNull_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        var saleToReturnFromRepo = new Sale
+        {
+            Id = 1,
+            CreatedAt = DateTime.UtcNow,
+            CustomerId = customerId,
+            TotalPrice = 45.99m,
+            Status = SaleStatus.Processing,
+            Notes = "Needed to buy a few items",
+            IsDeleted = false,
+            StreetNumber = "123456",
+            StreetName = "Main Street",
+            City = "New York City",
+            State = "New York",
+            Country = "USA",
+            ZipCode = "654321",
+            SaleItems = new List<SaleProduct>()
+        };
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetByIdAsync(saleToReturnFromRepo.Id))
+            .ReturnsAsync(saleToReturnFromRepo);
+        
+        // Act
+        var result = await _salesService.GetSaleByIdAsync(saleToReturnFromRepo.Id);
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Id.Should().Be(saleToReturnFromRepo.Id);
+
+        _mockSalesRepository
+            .Verify(repo => repo.GetByIdAsync(saleToReturnFromRepo.Id), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetSaleByIdAsync_WhenSaleToReturnIsNull_ShouldReturnFailureResult()
+    {
+        // Arrange 
+        var saleId = 1;
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetByIdAsync(saleId))
+            .ReturnsAsync((Sale?)null);
+        
+        // Act
+        var result = await _salesService.GetSaleByIdAsync(saleId);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain($"Sale with Id {saleId} found found");
+    }
+
+    [TestMethod]
+    public async Task GetSaleByIdAsync_WhenRepositoryThrowsArgumentNullException_ShouldReturnFailureResult()
+    {
+        // Arrange
+        var saleId = 1;
+       
+        _mockSalesRepository
+            .Setup(repo => repo.GetByIdAsync(saleId))
+            .ThrowsAsync(new ArgumentNullException(nameof(Sale)));
+        
+        // Act
+        var result = await _salesService.GetSaleByIdAsync(saleId);
+        
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Value.Should().BeNull();
+        result.ErrorMessage.Should().Contain("There was an error retrieving sale");
+    }
+
+    [TestMethod]
+    public async Task GetUserSalesAsync_WhenRepositoryDoesNotThrowArgumentNullException_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        var customerId = "customerId123";
+
+        var salesToReturnFromRepo = new List<Sale>()
+        {
+            new()
+            {
+                Id = 1,
+                CreatedAt = DateTime.UtcNow,
+                CustomerId = customerId,
+                TotalPrice = 45.99m,
+                Status = SaleStatus.Completed,
+                Notes = "Needed to buy a few items",
+                IsDeleted = false,
+                StreetNumber = "123456",
+                StreetName = "Main Street",
+                City = "New York City",
+                State = "New York",
+                Country = "USA",
+                ZipCode = "654321",
+                SaleItems = new List<SaleProduct>()
+            },
+            new()
+            {
+                Id = 2,
+                CreatedAt = DateTime.UtcNow,
+                CustomerId = customerId,
+                TotalPrice = 99.45m,
+                Status = SaleStatus.Processing,
+                Notes = "Needed to buy a few more things that I forgot",
+                IsDeleted = false,
+                StreetNumber = "123456",
+                StreetName = "Main Street",
+                City = "New York City",
+                State = "New York",
+                Country = "USA",
+                ZipCode = "654321",
+                SaleItems = new List<SaleProduct>()
+            }
+        };
+
+        var mockPagedList = new PagedList<Sale>(salesToReturnFromRepo, 2, 1, 10);
+
+        _mockSalesRepository
+            .Setup(repo => repo.GetByUserIdAsync(customerId, It.IsAny<PaginationParams>()))
+            .ReturnsAsync(mockPagedList);
+        
+        // Act
+        var result = await _salesService.GetUserSalesAsync(customerId, new PaginationParams());
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.CurrentPage.Should().Be(1);
+        result.Value.TotalPages.Should().Be(1);
+        result.Value.PageSize.Should().Be(10);
+        result.Value.TotalCount.Should().Be(2);
+        result.Value.Items.Count.Should().Be(2);
+        result.Value.Items.First().CustomerId.Should().Be(customerId);
+
+    }
 }
